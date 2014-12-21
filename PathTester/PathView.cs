@@ -34,8 +34,8 @@ namespace PathTester
 		public PathView(Controller controller, ViewComponent parent)
 			: base(controller, parent)
 		{
-			Controller.AddEventHandler("Keyboard", KeyboardEH);
-			Controller.AddEventHandler("Cursor", CursorMovedEH);
+			//Controller.AddEventHandler("Keyboard", KeyboardEH);
+			//Controller.AddEventHandler("Cursor", CursorMovedEH);
 		}
 
 		private void CursorMovedEH(object o, EventArgs args)
@@ -66,13 +66,11 @@ namespace PathTester
 			}
 			var slb = StateOneTime.Check(e.IsKeyPressed(Keys.LButton));
 			// TODO ---->>>
-			//тут. определить почему пауза между нажатиями не сильно регулируется
-			//и кнопка должна полностью гасить событие. может быть не хватает "handled"
-			//и опять чувствуется будет проблема с выяснением кто выше и кто должен обработать событие. в данном случае кнопка или компонент
+			//координаты курсора не выставляются. если разблокировать события курсора и клавиатуры вэтом файле то всё ок. возможно это не обрабатывается в ControlSystem
 			if (slb==StatesEnum.On){
 				p4 = new Point(cPoint.X, cPoint.Y);
-				Path p = new Path();
-				List<Point> pts=new List<Point>();
+				var p = new Path();
+				var pts=new List<Point>();
 				pts.Add(p1);
 				pts.Add(new Point(rnd.Next(1024),rnd.Next(768)));
 				pts.Add(new Point(rnd.Next(1024), rnd.Next(768)));

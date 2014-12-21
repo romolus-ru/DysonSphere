@@ -60,6 +60,7 @@ namespace Engine.Views.Templates
 			if (sk==StatesEnum.On){
 				Press();
 			}
+			if (StateOneKeyboard.CurrentState == StatesEnum.On) e.Handled = true;
 			base.Keyboard(sender, e);
 		}
 

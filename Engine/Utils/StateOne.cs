@@ -16,7 +16,7 @@ namespace Engine.Utils
 		/// <summary>
 		/// Текущее состояние
 		/// </summary>
-		protected StatesEnum CurrentState = StatesEnum.Off;
+		public StatesEnum CurrentState { get; protected set; }
 
 		/// <summary>
 		/// Делегат события включения состояния
@@ -28,6 +28,10 @@ namespace Engine.Utils
 		/// </summary>
 		public EventHandler StateOff = null;
 
+		public StateOne()
+		{
+			CurrentState = StatesEnum.Off;
+		}
 		/// <summary>
 		/// Проверяем нажатие
 		/// </summary> 
