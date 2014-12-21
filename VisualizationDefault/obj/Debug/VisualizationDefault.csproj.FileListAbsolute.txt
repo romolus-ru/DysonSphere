@@ -1,0 +1,9 @@
+D:\03_Sources\2013_12\dyson_Git\_bin\VisualizationDefault.exe.config
+D:\03_Sources\2013_12\dyson_Git\_bin\VisualizationDefault.exe
+D:\03_Sources\2013_12\dyson_Git\_bin\VisualizationDefault.pdb
+D:\03_Sources\2013_12\dyson_Git\DysonSphere\VisualizationDefault\obj\Debug\VisualizationDefault.csprojResolveAssemblyReference.cache
+D:\03_Sources\2013_12\dyson_Git\DysonSphere\VisualizationDefault\obj\Debug\VisualizationDefault.FormDefault.resources
+D:\03_Sources\2013_12\dyson_Git\DysonSphere\VisualizationDefault\obj\Debug\VisualizationDefault.Properties.Resources.resources
+D:\03_Sources\2013_12\dyson_Git\DysonSphere\VisualizationDefault\obj\Debug\VisualizationDefault.csproj.GenerateResource.Cache
+D:\03_Sources\2013_12\dyson_Git\DysonSphere\VisualizationDefault\obj\Debug\VisualizationDefault.exe
+D:\03_Sources\2013_12\dyson_Git\DysonSphere\VisualizationDefault\obj\Debug\VisualizationDefault.pdb
