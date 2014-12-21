@@ -1,0 +1,90 @@
+﻿using System;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using Engine;
+using Engine.Controllers.Events;
+
+namespace VisualizationOpenGL4
+{
+	/// <summary>
+	/// Создаётся исключительно для данной визуализации
+	/// </summary>
+	class OpenGLInput : Input
+	{
+		/// <summary>
+		/// Стандартная обработка мышки и клавиатуры для Windows
+		/// </summary>
+		/// <remarks>Тут в основном ничего не делаем - конструктор используется от TInput</remarks>
+		public OpenGLInput() { }
+
+		[DllImport("User32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static extern bool GetKeyboardState(byte[] lpKeyState);
+
+		/// <summary>
+		/// массив с нажатыми кнопками. никому недоступен
+		/// </summary>
+		private byte[] _keys = new byte[256];
+
+		/// <summary>
+		/// Установить какие кнопки нажаты
+		/// </summary>
+		/// <returns>Нажата ли хоть 1 клавиша</returns>
+		protected override Boolean SetKeyboard()
+		{
+			Boolean ret = false;
+			GetKeyboardState(_keys);
+			// проходим по первой половине массива
+			for (int i = 0; i < 128; i++)
+			{
+				// если старший бит установлен, то 
+				if ((_keys[i] & 0x80) == 0) continue;
+				//_controller.StartEvent("ViewStringListAdd", this, MessageEventArgs.Msg("Кнопка " + i + " значение " + _keys[i]));
+				ret = true;
+				break;
+			}
+			return ret;
+		}
+
+		/// <summary>
+		/// Проверить, нажата ли клавиша
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public override bool isKeyPressed(Keys key)
+		{
+			// проверяем установлен ли старший бит. если установлен возвращаем true
+			// и заодно переводим переданный код к типу целое число
+			return (_keys[(int)key] & 0x80) != 0;
+		}
+
+		/// <summary>
+		/// Установить новые координаты курсора
+		/// </summary>
+		/// <returns></returns>
+		protected override Boolean SetCursor()
+		{
+			Boolean ret = false;
+			var newCur = Cursor.Position;// экранные координаты курсора
+
+			// преобразуем координаты в клиентские
+			// (в полноэкранном режиме это всё ненужно)
+			PointEventArgs newCurClient = PointEventArgs.Set(newCur);// создаём аргументы для передачи координат
+			_controller.StartEvent("VisualizationCursorGet", this, newCurClient);// получаем обновлённые координаты
+
+			if (newCur.X != curOldX)
+			{
+				cursorX = newCurClient.Pt.X;
+				curOldX = newCur.X;
+				ret = true;
+			}
+			if (newCur.Y != curOldY)
+			{
+				cursorY = newCurClient.Pt.Y;
+				curOldY = newCur.Y;
+				ret = true;
+			}
+			return ret;
+		}
+	}
+}
