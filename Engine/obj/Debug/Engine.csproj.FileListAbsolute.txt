@@ -1,0 +1,8 @@
+d:\03_Sources\2013_12\dyson_Git\_bin\Engine.exe.config
+d:\03_Sources\2013_12\dyson_Git\_bin\Engine.exe
+d:\03_Sources\2013_12\dyson_Git\_bin\Engine.pdb
+d:\03_Sources\2013_12\dyson_Git\DysonSphere\Engine\obj\Debug\Engine.Properties.Resources.resources
+d:\03_Sources\2013_12\dyson_Git\DysonSphere\Engine\obj\Debug\Engine.csproj.GenerateResource.Cache
+d:\03_Sources\2013_12\dyson_Git\DysonSphere\Engine\obj\Debug\Engine.exe
+d:\03_Sources\2013_12\dyson_Git\DysonSphere\Engine\obj\Debug\Engine.pdb
+d:\03_Sources\2013_12\dyson_Git\DysonSphere\Engine\obj\Debug\Engine.csprojResolveAssemblyReference.cache
