@@ -45,11 +45,10 @@ namespace Engine.Utils.Editor
 		/// </summary>
 		protected int MapDelta=16;
 
-		public Layer(Controller controller, String layerName, String viewLayer,ViewComponent parent) : base(controller,parent)
+		public Layer(Controller controller, String layerName, ViewComponent parent) : base(controller,parent)
 		{
 			_counter = 0;
 			LayerName = layerName;
-			ViewLayer = viewLayer;
 			IsCanStartDrag = false;// надо активировать режим извне, что бы отлавливать перемещение
 			CanStore = true;// по умолчанию можно сохранять данные слоя
 		}

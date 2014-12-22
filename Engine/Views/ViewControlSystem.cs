@@ -5,7 +5,7 @@ using Engine.Controllers.Events;
 namespace Engine.Views
 {
 	/// <summary>
-	/// Обобщённый компонент, содержит другие компоненты и определяет очередность обработки событий клавиатуры и мыши
+	/// Обобщённый компонент, штучный, содержит другие компоненты и определяет очередность обработки событий клавиатуры и мыши
 	/// </summary>
 	public class ViewControlSystem : ViewControl
 	{
@@ -45,6 +45,14 @@ namespace Engine.Views
 			base.Cursor(o, args);
 			_cursorX = args.Pt.X;
 			_cursorY = args.Pt.Y;
+			if (Parent != null){
+				foreach (var component in Components){
+					if (!component.CanDraw) continue; // компонент скрыт
+					var c = component as ViewControl;
+					if (c == null) continue;// компонент уровня контрол и умеет передавать событие курсора вложенным компонентам
+					c.DeliverCursorEH(o, args);
+				}
+			}
 		}
 
 		public override void Keyboard(object o, InputEventArgs args)

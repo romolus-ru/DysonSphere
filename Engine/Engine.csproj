@@ -113,6 +113,7 @@
     <Compile Include="Utils\StateOneTime.cs" />
     <Compile Include="Utils\StatesEnum.cs" />
     <Compile Include="Views\IViewObject.cs" />
+    <Compile Include="Views\Templates\Background.cs" />
     <Compile Include="Views\Templates\Button.cs" />
     <Compile Include="Views\Templates\InputView.cs" />
     <Compile Include="Views\Templates\IntroView.cs" />
@@ -122,7 +123,11 @@
     <Compile Include="Views\ViewControlDraggable.cs" />
     <Compile Include="Views\ViewControlSystem.cs" />
     <Compile Include="Views\ViewDraggable.cs" />
+    <Compile Include="Views\ViewLabel.cs" />
+    <Compile Include="Views\ViewModal.cs" />
+    <Compile Include="Views\ViewModalInput.cs" />
     <Compile Include="Views\ViewObject.cs" />
+    <Compile Include="Views\ViewWindow.cs" />
     <Compile Include="VisualizationProvider.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

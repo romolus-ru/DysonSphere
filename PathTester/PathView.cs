@@ -22,31 +22,18 @@ namespace PathTester
 		private List<Path> paths = new List<Path>();
 		private StateOneTime StateOneTime;
 
+		public PathView(Controller controller, ViewComponent parent) : base(controller, parent)
+		{}
+
 		public override void Init(VisualizationProvider visualizationProvider)
 		{
 			base.Init(visualizationProvider);
-			visualizationProvider.LoadTexture("hider", @"..\Resources\hider001.jpg");// грузим текстуру основную
 			StateOneTime = StateOneTime.Init(5);
+			Width = visualizationProvider.CanvasWidth;
+			Height = visualizationProvider.CanvasHeight;
 		}
 
 		private pt cPoint = new pt(10, 10);
-
-		public PathView(Controller controller, ViewComponent parent)
-			: base(controller, parent)
-		{
-			//Controller.AddEventHandler("Keyboard", KeyboardEH);
-			//Controller.AddEventHandler("Cursor", CursorMovedEH);
-		}
-
-		private void CursorMovedEH(object o, EventArgs args)
-		{
-			CursorMoved(o, args as PointEventArgs);
-		}
-
-		private void KeyboardEH(object o, EventArgs args)
-		{
-			Keyboard(o, args as InputEventArgs);
-		}
 
 		/// <summary>
 		/// Отслеживаем перемещение курсора
@@ -58,6 +45,17 @@ namespace PathTester
 			cPoint = point.Pt;// точка где счас находится курсор
 		}
 
+		/// <summary>
+		/// Отслеживаем перемещение курсора
+		/// </summary>
+		/// <param name="o"></param>
+		/// <param name="args"></param>
+		public override void Cursor(object o, PointEventArgs args)
+		{
+			base.Cursor(o, args);
+			cPoint = args.Pt;// точка где счас находится курсор
+		}
+
 		public override void Keyboard(object sender, InputEventArgs e)
 		{
 			if (e.IsKeyPressed(Keys.RButton))
@@ -65,8 +63,6 @@ namespace PathTester
 				p1 = new Point(cPoint.X, cPoint.Y);
 			}
 			var slb = StateOneTime.Check(e.IsKeyPressed(Keys.LButton));
-			// TODO ---->>>
-			//координаты курсора не выставляются. если разблокировать события курсора и клавиатуры вэтом файле то всё ок. возможно это не обрабатывается в ControlSystem
 			if (slb==StatesEnum.On){
 				p4 = new Point(cPoint.X, cPoint.Y);
 				var p = new Path();
@@ -84,22 +80,16 @@ namespace PathTester
 
 		protected override void DrawObject(VisualizationProvider visualizationProvider)
 		{
-			visualizationProvider.SetColor(Color.White, 80);
-			visualizationProvider.DrawTexture(1024 / 2, 768 / 2, "hider");
-
-			foreach (var path in paths)
-			{
-				if (pause == 0) { path.num++; }
+			foreach (var path in paths){
+				if (pause == 0){path.num++;}
 				Point pt1 = null;
-				foreach (Point p in path.Points())
-				{
-					if (pt1 == null) { pt1 = p; continue; }
+				foreach (Point p in path.Points()){
+					if (pt1 == null){pt1 = p;continue;}
 					visualizationProvider.SetColor(Color.Bisque, 100);
 					visualizationProvider.Line(pt1.X, pt1.Y, p.X, p.Y);
 					pt1 = p;
 				}
 			}
-
 		}
 
 	}

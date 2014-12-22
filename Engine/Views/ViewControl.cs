@@ -62,7 +62,8 @@ namespace Engine.Views
 			if (a == null){return;}
 			Keyboard(o, a);
 			if (Components != null){
-				foreach (var component in Components){
+				var componentsLocal = Components.ToArray();// что бы небыло ошибки что список компонентов изменен
+				foreach (var component in componentsLocal){
 					if (a.Handled) break; // если событие было обработано - выходим
 					// все объекты получат событие клавиатуры, даже если курсор не над ними
 					// компонент сам должен решить реагировать или нет

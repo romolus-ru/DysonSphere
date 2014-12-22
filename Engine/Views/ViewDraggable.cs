@@ -87,6 +87,7 @@ namespace Engine.Views
 		{
 			var sLButton = _stateLButton.Check(e.IsKeyPressed(Keys.LButton));
 			if (DragStarted){// кнопка не нажата, значит формируем сигнал о завершении перемещения
+				e.Handled = true;
 				if (sLButton == StatesEnum.Off){
 					OnDragEnd(CursorPointFrom.X - e.cursorX, CursorPointFrom.Y - e.cursorY);
 					DragStarted = false;

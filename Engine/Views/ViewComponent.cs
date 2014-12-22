@@ -9,6 +9,7 @@ namespace Engine.Views
 	/// <summary>
 	/// Компонент умеет работать с вложенными компонентами и определяет возможности работы с клавиатурой и мышкой
 	/// </summary>
+	/// <remarks>События обрабатываются в прямом порядке объектов в списке Components, а прорисовывается всё в обратном</remarks>
 	public class ViewComponent:ViewObject
 	{
 		/// <summary>
@@ -21,6 +22,7 @@ namespace Engine.Views
 		/// </summary>
 		protected VisualizationProvider VisualizationProvider;
 
+		// TODO может быть имеет смысл упростить разрешение (до ViewObject) а где нужно проверять - если это VicewComponent то копать глубже
 		/// <summary>
 		/// Компоненты. извне недоступны. по возможности убрать и для предков
 		/// </summary>
@@ -46,7 +48,7 @@ namespace Engine.Views
 		{
 			Components.Add(component);
 			component.Parent = this;
-			component.HandlersAdd();
+			component.HandlersAdd(); HandlersAdd() и тут и в init. где то лишний
 			component.Show();
 			component.Init(VisualizationProvider);
 		}
@@ -62,7 +64,7 @@ namespace Engine.Views
 			Components.Remove(component);
 		}
 
-		public ViewComponent(Controller controller, ViewComponent parent) : base(controller)
+		public ViewComponent(Controller controller, ViewComponent parent=null) : base(controller)
 		{
 			Parent = parent;
 			if (parent != null){
@@ -79,6 +81,10 @@ namespace Engine.Views
 			if (Components.Contains(topObject)){
 				Components.Remove(topObject);
 				Components.Insert(0,topObject);
+			}else{
+				foreach (var component in Components){
+					component.BringToFront(topObject);// каждый компонент который может содержать другие объекты 
+				}
 			}
 		}
 
@@ -92,6 +98,10 @@ namespace Engine.Views
 			{
 				Components.Remove(topObject);
 				Components.Add(topObject);
+			}else{
+				foreach (var component in Components){
+					component.SendToBack(topObject);// каждый компонент который может содержать другие объекты 
+				}
 			}
 		}
 
@@ -177,8 +187,8 @@ namespace Engine.Views
 		protected virtual void DrawComponents(VisualizationProvider visualizationProvider)
 		{
 			visualizationProvider.OffsetAdd(X, Y);// смещаем и рисуем компоненты независимо от их настроек
-			foreach (var component in Components)
-			{
+			for (int index = Components.Count-1; index>=0; index--){
+				var component = Components[index];
 				component.Draw(visualizationProvider);
 			}
 			visualizationProvider.OffsetRemove();// восстанавливаем смещение			

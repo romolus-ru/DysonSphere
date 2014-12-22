@@ -1,4 +1,6 @@
-﻿using Engine.Controllers;
+﻿using System;
+using Engine.Controllers;
+using Engine.Controllers.Events;
 
 namespace Engine.Views
 {
@@ -31,9 +33,29 @@ namespace Engine.Views
 		{
 			// сохраняем всё самое важное из переданного
 			_visualizationProvider = visualizationProvider;
-			//_controller = controller;
 			_viewMainObjects = new ViewControlSystem(controller);
 			_viewMainObjects.Init(_visualizationProvider);
+			controller.AddEventHandler("ViewBringToFront", EHBringToFront);
+			controller.AddEventHandler("ViewAddObject", (o, args) => EHAddObject(o, args as ViewObjectEventArgs));
+			controller.AddEventHandler("ViewDelObject", (o, args) => EHDelObject(o, args as ViewObjectEventArgs));
+
+		}
+
+		private void EHAddObject(object sender, ViewObjectEventArgs viewObjectEventArgs)
+		{
+			_viewMainObjects.AddComponent(viewObjectEventArgs.ViewObject as ViewComponent);
+		}
+
+		private void EHDelObject(object sender, ViewObjectEventArgs viewObjectEventArgs)
+		{
+			_viewMainObjects.Remove(viewObjectEventArgs.ViewObject as ViewComponent);
+		}
+
+		private void EHBringToFront(object sender, EventArgs eaArgs)
+		{
+			var c = sender as ViewComponent;
+			if (c == null) return;
+			_viewMainObjects.BringToFront(c);
 		}
 
 		/// <summary>
