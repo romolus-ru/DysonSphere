@@ -4,7 +4,6 @@ using System.Drawing;
 using Engine.Controllers;
 using Engine.Controllers.Events;
 using Engine.Utils;
-using Engine.Utils.ExtensionMethods;
 
 namespace Engine.Views.Templates
 {
@@ -45,6 +44,7 @@ namespace Engine.Views.Templates
 		/// </summary>
 		public void Press()
 		{
+			// TODO надо проверить, лучше что бы было расшарено, но в то же время нажатие становится неуправляемым
 			if (Controller != null){
 				Controller.AddToOperativeStore(_eventName, this, EventArgs.Empty);
 			}
@@ -53,6 +53,7 @@ namespace Engine.Views.Templates
 		public override void Keyboard(object sender, InputEventArgs e)
 		{
 			if (!CanDraw) return;
+			if (!CursorOver) return;
 			// (если нажата кнопка мыши и мышка находится над кнопкой) или (если нажата кнопка на клавиатуре)
 			bool b = e.IsKeyPressed(Keys.LButton);
 			bool b2 = e.IsKeyPressed(Key);
@@ -90,6 +91,11 @@ namespace Engine.Views.Templates
 			if (Hint != "" && CursorOver){
 				visualizationProvider.Print(X + 10, Y + Height + 5, Hint);
 			}
+
+			if (this.Name == "UU"){
+			//	throw new Exception("test");
+			}
+
 		}
 
 		/// <summary>

@@ -142,13 +142,15 @@ namespace Engine
 				}
 			}
 
+			// TODO главное что бы тут было всё ок
+			if (curNew){// запускаем событие обработки изменения положения курсора
+				_controller.StartEvent("Cursor", this, PointEventArgs.Set(cursorX, cursorY));
+			}
+
 			if (keyNew){// запускаем событие обработки клавиатуры и мышки
 				if (!keyboardCleared){
 					_controller.StartEvent("Keyboard", this, InputEventArgs.Input(this));
 				}
-			}
-			if (curNew){// запускаем событие обработки изменения положения курсора
-					_controller.StartEvent("Cursor", this, PointEventArgs.Set(cursorX, cursorY));
 			}
 		}
 

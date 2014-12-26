@@ -48,8 +48,8 @@ namespace Engine.Views
 		{
 			Components.Add(component);
 			component.Parent = this;
-			component.HandlersAdd(); HandlersAdd() надо сделать обёртку над методом, который будет предотвращать повторное выполнение 
-				// в remove точно нужно вызывать, потому что объект могут изъять из одного компонента и подсадить к другому, поэтому независимо их нужно будет вызывать
+			component.HandlersAddThis();
+			// TODO ---->>>> removeHandlers
 			component.Show();
 			component.Init(VisualizationProvider);
 		}
@@ -60,7 +60,7 @@ namespace Engine.Views
 		/// <param name="component"></param>
 		public void Remove(ViewComponent component)
 		{
-			component.HandlersRemove();
+			component.HandlersRemoveThis();
 			component.Hide();
 			Components.Remove(component);
 		}
@@ -171,7 +171,17 @@ namespace Engine.Views
 		}
 
 		/// <summary>
-		/// Прорисовать фон компонент, если нужно (можно сделать что бы это была простая панелька)
+		/// Прорисовать фон компонентов, если нужно (можно сделать что бы это была простая панелька)
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		/// </summary>
 		/// <param name="visualizationProvider"></param>
 		protected virtual void DrawComponentBackground(VisualizationProvider visualizationProvider)

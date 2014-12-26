@@ -75,22 +75,22 @@ namespace Engine.Views
 
 		}
 
-		public override void HandlersAdd()
+		protected override void HandlersAdder()
 		{
-			base.HandlersAdd();
+			base.HandlersAdder();
 			if (Parent == null){
 				Controller.AddEventHandler("Cursor", CursorEH);
 				Controller.AddEventHandler("Keyboard", KeyboardEH);
 			}
 		}
 
-		public override void HandlersRemove()
+		protected override void HandlersRemover()
 		{
 			if (Parent == null){
 				Controller.RemoveEventHandler("Cursor", CursorEH);
 				Controller.RemoveEventHandler("Keyboard", KeyboardEH);
 			}
-			base.HandlersRemove();
+			base.HandlersRemover();
 		}
 
 	}

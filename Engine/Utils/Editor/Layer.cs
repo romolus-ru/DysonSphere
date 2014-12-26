@@ -221,11 +221,11 @@ namespace Engine.Utils.Editor
 			set{
 				_activeHandlers = value;
 				if (_activeHandlers){
-					HandlersAdd();
+					HandlersAddThis();
 					Show();
 				}
 				else{
-					HandlersRemove();
+					HandlersRemoveThis();
 					Hide();
 				}
 			}

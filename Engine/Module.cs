@@ -41,7 +41,7 @@ namespace Engine
 			Controller = controller;
 			SetUpModel(model, Controller);
 			SetUpView(view, Controller);
-			HandlersAdd();
+			HandlersAddThis();
 		}
 
 		/// <summary>
@@ -73,18 +73,18 @@ namespace Engine
 		public virtual void Dispose()
 		{
 			if (!_disposed){
-				HandlersRemove();
+				HandlersRemoveThis();
 				Controller = null;
 				_disposed = true;
 			}		
 		}
 
-		public virtual void HandlersAdd()
+		public virtual void HandlersAddThis()
 		{
 			
 		}
 
-		public virtual void HandlersRemove()
+		public virtual void HandlersRemoveThis()
 		{
 			
 		}

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Forms;
 using Engine.Controllers;
 using Engine.Controllers.Events;
 
@@ -8,6 +7,8 @@ namespace Engine.Views
 	/// <summary>
 	/// Прячет клавиатуру и мышь, что бы работать с ними единолично
 	/// </summary>
+	/// <remarks>Несамостоятельный объект. При создании необходимо передать созданный модальный объект управляющему объекту
+	/// А после - запустить метод удаления объекта</remarks>
 	public class ViewModal : ViewControl
 	{
 		/// <summary>
@@ -15,41 +16,44 @@ namespace Engine.Views
 		/// </summary>
 		public int ModalResult = 0;
 
+		/// <summary>
+		/// Событие, которое сработает при закрытии модального окна
+		/// </summary>
 		protected String OutEvent;
-		protected Boolean DeleteObject;// флаг удаления объекта
+		/// <summary>
+		/// Событие, в котором надо удалить объект 
+		/// </summary>
+		protected String DestroyEvent;
 
 		/// <summary>
 		/// Конструктор
 		/// </summary>
 		/// <param name="controller"></param>
+		/// <param name="parent">Объект, к которому присоединяется модальный объект</param>
 		/// <param name="outEvent">Событие, генерируемое при выходе или закрытии модального объекта</param>
-		public ViewModal(Controller controller, String outEvent): base(controller,null)
+		/// <param name="destroyEvent">Событие для удаления модального объекта</param>
+		public ViewModal(Controller controller, ViewComponent parent, String outEvent, String destroyEvent): base(controller,parent)
 		{
-			DeleteObject = false;
 			OutEvent = outEvent;
-			Controller.AddToOperativeStore("ViewAddObject", this, ViewObjectEventArgs.vObj(this));
+			DestroyEvent = destroyEvent;
 		}
 
-		public override void HandlersAdd()
+		protected override void HandlersAdder()
 		{
-			base.HandlersAdd();
+			base.HandlersAdder();
 			Controller.PushEventHandlers("Keyboard");
 			Controller.PushEventHandlers("Cursor");
-			Controller.PushEventHandlers("KeyboardInRange");
-			Controller.PushEventHandlers("zOrderToTop");
 
 			Controller.AddEventHandler("Keyboard", KeyboardEH);
 			Controller.AddEventHandler("Cursor", CursorEH);
 		}
 
-		public override void HandlersRemove()
+		protected override void HandlersRemover()
 		{
 			Controller.PopEventHandlers("Keyboard");
 			Controller.PopEventHandlers("Cursor");
-			Controller.PushEventHandlers("KeyboardInRange");
-			Controller.PushEventHandlers("zOrderToTop");
 
-			base.HandlersRemove();
+			base.HandlersRemover();
 		}
 
 		private void CursorEH(object o, EventArgs args)
@@ -60,26 +64,6 @@ namespace Engine.Views
 		private void KeyboardEH(object o, EventArgs args)
 		{
 			DeliverKeyboardEH(o, args);
-			//Keyboard(o, args as InputEventArgs);
-		}
-
-		public override void Keyboard(object o, InputEventArgs inputEventArgs)
-		{
-			base.Keyboard(o, inputEventArgs);
-			if (inputEventArgs.IsKeyPressed(Keys.D8)){
-				// TODO keyboardClear
-				inputEventArgs.KeyboardClear();// по идее ещё надо удалить объект из системы
-				DeleteObject = true;
-			}
-			if (DeleteObject){// раз флаг установлен, то надо удалять объект
-				DeleteObjectViewModal();
-			}
-		}
-
-		private void DeleteObjectViewModal()
-		{
-			Controller.AddToOperativeStore(OutEvent, this, EventArgs.Empty);
-			Controller.AddToOperativeStore("ViewDelObject", this, ViewObjectEventArgs.vObj(this));
 		}
 	}
 }

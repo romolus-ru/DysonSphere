@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Windows.Forms;
 using Engine;
 using Engine.Controllers;
-using Engine.Controllers.Events;
-using Engine.Utils;
-using Engine.Utils.ExtensionMethods;
 using Engine.Views;
 using Engine.Utils.Editor;
-using Engine.Views.Templates;
 using Button = Engine.Views.Templates.Button;
 
 namespace SimpleMapEditor
@@ -45,7 +39,7 @@ namespace SimpleMapEditor
 			sys.AddComponent(Button.CreateButton(controller, 800, 720, 100, 20, "SimpleLoad", "Загрузить", "L", Keys.L,""));
 			sys.AddComponent(Button.CreateButton(controller, 950, 25, 74, 20, "MapView", "Карта", "Просмотр карты", Keys.M,""));
 			sys.AddComponent(Button.CreateButton(controller, 950, 55, 74, 20, "ModalStart", "Modal", "Модальный запрос", Keys.H,""));
-
+			
 			CreateEditor();
 			var s = new SimpleEditableObject();
 			s.X = 32;
@@ -57,16 +51,17 @@ namespace SimpleMapEditor
 			Controller.AddEventHandler("MapView", MapView);
 			Controller.AddEventHandler("ExitFullView", MapView);
 			Controller.AddEventHandler("ModalStart", ModalStart);
-			Controller.AddEventHandler("ModalClosed", ModalResult);
+			Controller.AddEventHandler("ModalResult", ModalResult);
+			Controller.AddEventHandler("ModalDestroy", ModalDestroy);
 
 			//Controller.AddEventHandler("ModalInputStart", ModalInputStart);
 			//Controller.AddEventHandler("ModalInputClosed", ModalInputResult);
-
-			window2 = new ViewWindow(Controller, sys);
+			
+			window2 = new SimpleWindow(Controller, sys);
 			window2.SetCoordinates(200, 650, 0);
 			window2.SetSize(100, 50);
-			window2.Name = "w2";
-			sys.AddComponent(window2);
+			//window2.Name = "w2";
+			//sys.AddComponent(window2);
 		}
 
 		/*private void ModalInputResult(object sender, EventArgs e)
@@ -91,21 +86,21 @@ namespace SimpleMapEditor
 			if (m != null){
 				var i = m.ModalResult;
 			}
-			//sys.Remove(selectFile);
-			//Controller.ViewDelObjectCommand(this, selectFile);
-			//selectFile.Dispose();
-			//selectFile = null;
+		}
+
+		private void ModalDestroy(object sender, EventArgs e)
+		{
+			sys.Remove(selectFile);
+			selectFile.Dispose();
+			selectFile = null;
 		}
 
 		private void ModalStart(object sender, EventArgs e)
 		{
-			//selectFile = 
-			new ViewModalSelectFile(Controller, "ModalClosed");
-			//Controller.StartEvent("ViewAddObject", this, ViewObjectEventArgs.vObj(selectFile));
-			//Controller.ViewAddObjectCommand(this, selectFile);
-			//sys.AddComponent(selectFile);
+			selectFile = new ViewModalSelectFile(Controller,null, "ModalClosed","ModalDestroy");
+			sys.AddComponent(selectFile);
 		}
-
+		
 		/// <summary>
 		/// Переключение режима просмотра карты
 		/// </summary>

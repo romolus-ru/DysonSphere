@@ -13,7 +13,8 @@ namespace Engine.Views
 		private String _text;
 		private String _value;
 
-		public ViewModalInput(Controller controller, string outEvent, string value) : base(controller, outEvent)
+		public ViewModalInput(Controller controller, string outEvent, string destroyEvent, string value)
+			: base(controller, null, outEvent,destroyEvent)
 		{
 			_text = value;
 			_value = value;

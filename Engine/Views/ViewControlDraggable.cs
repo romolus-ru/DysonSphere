@@ -12,7 +12,7 @@ namespace Engine.Views
 	{
 		public ViewDraggable Draggable;
 		public ViewControlDraggable(Controller controller, ViewComponent parent)
-			: base(controller, parent)
+			: base(controller,parent)
 		{
 			//IsCanStartDrag = false;// надо активировать режим извне, что бы отлавливать перемещение
 			Draggable = new ViewDraggable(Controller);
@@ -55,6 +55,16 @@ namespace Engine.Views
 		}
 
 		/// <summary>
+		/// Сохраняемая координата курсора
+		/// </summary>
+		private int _cursorX;
+
+		/// <summary>
+		/// Сохраняемая координата курсора
+		/// </summary>
+		private int _cursorY;
+	
+		/// <summary>
 		/// Определяем то что зависит от перемещения курсора
 		/// </summary>
 		/// <param name="sender"></param>
@@ -63,6 +73,20 @@ namespace Engine.Views
 		public override void Cursor(object sender, PointEventArgs point)
 		{
 			Draggable.Cursor(sender, point);
+			if (Draggable.DragStarted)return;
+			base.Cursor(sender, point);// код взят из ViewControlSystem
+			_cursorX = point.Pt.X;
+			_cursorY = point.Pt.Y;
+			if (Parent != null)
+			{
+				foreach (var component in Components)
+				{
+					if (!component.CanDraw) continue; // компонент скрыт
+					var c = component as ViewControl;
+					if (c == null) continue;// компонент уровня контрол и умеет передавать событие курсора вложенным компонентам
+					c.DeliverCursorEH(sender, point);
+				}
+			}
 		}
 		public override void Keyboard(object sender, InputEventArgs e)
 		{
@@ -120,5 +144,6 @@ namespace Engine.Views
 			if (DragStarted) return true;// в процессе перемещения объект занимает весь объем
 			return base.InRange(x, y);
 		}
+
 	}
 }

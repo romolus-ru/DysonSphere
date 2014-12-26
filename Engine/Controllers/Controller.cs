@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Engine.Controllers.Events;
 using Engine.Utils;
 
@@ -152,6 +153,7 @@ namespace Engine.Controllers
 		/// <param name="eventArgs"></param>
 		public void AddToOperativeStore(String eventName, Object sender, EventArgs eventArgs)
 		{
+			Debug.WriteLine("addToOperativeStore " + eventName);
 			AddToOperativeStore(sender, StoredEventEventArgs.Stored(eventName, sender, eventArgs));
 		}
 
@@ -312,6 +314,7 @@ namespace Engine.Controllers
 		/// <param name="eventArgs">Аргументы запускаемого события</param>
 		public void StartEvent(String eventName, Object sender=null, EventArgs eventArgs=null)
 		{
+			Debug.WriteLineIf(eventName == "mP", "mp запущен");
 			if (_controllers.ContainsKey(eventName)) {
 				if (eventArgs == null) {
 					eventArgs = EventArgs.Empty;

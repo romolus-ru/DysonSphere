@@ -12,6 +12,8 @@ namespace Engine.Controllers.Events
 	/// куда надо, а не передавать отдельно имя отправителя и аргументы</remarks>
 	public class StoredEventEventArgs : EngineEventArgs
 	{
+		private static int count = 0;
+		public int Num;
 		/// <summary>Время срабатывания</summary>
 		public TimeSpan EventTime { get; set; }
 		/// <summary>Имя события</summary>
@@ -27,12 +29,13 @@ namespace Engine.Controllers.Events
 		/// <returns></returns>
 		public static StoredEventEventArgs Stored(String eventName, Object eventSender, EventArgs eventArguments)
 		{
-			var st = new StoredEventEventArgs();
-			st.EventTime = TimeSpan.Zero;
-			st.EventName = eventName;
-			st.EventSender = eventSender;
-			st.EventArguments = eventArguments;
-			return st;
+			return Stored(TimeSpan.Zero, eventName, eventSender, eventArguments);
+			//var st = new StoredEventEventArgs();
+			//st.EventTime = TimeSpan.Zero;
+			//st.EventName = eventName;
+			//st.EventSender = eventSender;
+			//st.EventArguments = eventArguments;
+			//return st;
 		}
 
 		/// <summary>
@@ -42,6 +45,8 @@ namespace Engine.Controllers.Events
 		public static StoredEventEventArgs Stored(TimeSpan eventTime, String eventName, Object eventSender, EventArgs eventArguments)
 		{
 			var st = new StoredEventEventArgs();
+			count++;
+			st.Num = count;
 			st.EventTime = eventTime;
 			st.EventName = eventName;
 			st.EventSender = eventSender;

@@ -15,12 +15,12 @@ namespace Engine
 		/// <summary>
 		/// Добавить обработчики
 		/// </summary>
-		void HandlersAdd();
+		void HandlersAddThis();
 
 		/// <summary>
 		/// Удалить обработчики
 		/// </summary>
-		void HandlersRemove();
+		void HandlersRemoveThis();
 
 
 	}

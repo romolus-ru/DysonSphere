@@ -183,7 +183,11 @@ namespace Engine
 		/// <param name="width"></param>
 		/// <param name="height"></param>
 		public void Rectangle(int x, int y, int width, int height)
-		{_Rectangle(x + curOffsetX, y + curOffsetY, width, height);}
+		{
+			//_Rectangle(x + curOffsetX, y + curOffsetY, width, height);
+			// TODO раньше был curOffset, но без него работает лучше
+			_Rectangle(x, y, width, height);
+		}
 
 		protected virtual void _Rectangle(int x, int y, int width, int height)
 		{

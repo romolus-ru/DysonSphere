@@ -27,17 +27,47 @@ namespace Engine.Views
 			CanDraw = true;
 		}
 
+		// TODO создать объект движка в котором будут интегрированы эти и возможно другие интерфейсы что бы точно было единообразно
+		// и заодно будет видно как будет вести себя наследование интерфейсов и наследование классов
+		private Boolean HandlersAdded = false;
+		private Boolean HandlersRemoved = false;
+
 		/// <summary>
 		/// Добавить обработчики
 		/// </summary>
-		public virtual void HandlersAdd()
+		/// <remarks>Можно вызывать много раз - добавится всё равно только 1</remarks>
+		public void HandlersAddThis()
+		{
+			if (HandlersAdded) return;// проверка
+			HandlersAdder();// добавляем
+			HandlersAdded = true;
+			HandlersRemoved = false;// разрешаем удалить
+		}
+
+		/// <summary>
+		/// Удалить обработчики
+		/// </summary>
+		/// <remarks>Можно вызывать много раз - удалится всё равно только 1</remarks>
+		public void HandlersRemoveThis()
+		{
+			if (HandlersRemoved) return;//проверка
+			HandlersRemover();//удаляем
+			HandlersRemoved = true;
+			HandlersAdded = false;//разрешаем добавить
+		}
+		/// <summary>
+		/// Добавить обработчики
+		/// </summary>
+		/// <remarks>Предназначения для переопределения пользователем</remarks>
+		protected virtual void HandlersAdder()
 		{
 		}
 	
 		/// <summary>
 		/// Удалить обработчики
 		/// </summary>
-		public virtual void HandlersRemove()
+		/// <remarks>Предназначена для переопределения пользователем</remarks>
+		protected virtual void HandlersRemover()
 		{
 		}
 		
@@ -60,7 +90,7 @@ namespace Engine.Views
 		/// <param name="visualizationProvider"></param>
 		public virtual void Init(VisualizationProvider visualizationProvider)
 		{
-			HandlersAdd();
+			HandlersAddThis();
 			Show();// по умолчанию объект показываем
 		}
 
@@ -312,7 +342,7 @@ namespace Engine.Views
 		{
 			if (!_disposed)
 			{
-				HandlersRemove();
+				HandlersRemoveThis();
 				Controller = null;
 				_disposed = true;
 			}

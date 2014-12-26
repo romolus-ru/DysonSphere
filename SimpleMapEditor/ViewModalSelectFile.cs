@@ -13,17 +13,36 @@ namespace SimpleMapEditor
 	{
 		//TODO сделать визуализатор количества обработчикиов у событий и что бы они выводились справочно (можно было скрыть и переместить иконку, отдельный вспомогательный объект)
 
-		public ViewModalSelectFile(Controller controller, string outEvent)
-			: base(controller, outEvent)
+		public ViewModalSelectFile(Controller controller, ViewComponent parent, string outEvent,string destroyEvent)
+			: base(controller,parent, outEvent,destroyEvent)
 		{
+			
+		}
+
+		public override void Init(VisualizationProvider visualizationProvider)
+		{
+			base.Init(visualizationProvider);
 			SetCoordinates(200, 200, 0);
-			SetSize(500,100);
-			EscButton = Button.CreateButton(Controller, 280, 10, 100, 20, OutEvent+"Esc", "Закрыть", "Закрыть", Keys.None, "");
+			SetSize(500, 100);
+			EscButton = Button.CreateButton(Controller, 280, 10, 100, 20, OutEvent, "Закрыть", "Закрыть", Keys.None, "");
 			AddComponent(EscButton);
-			for (int i = 1; i < 10; i++){
-				var btn = Button.CreateButton(Controller, 10 + i*42, 40, 40, 40, "modalPressed", "" + i, "" + i, Keys.None, "");
+			for (int i = 1; i < 10; i++)
+			{
+				var btn = Button.CreateButton(Controller, 10 + i * 42, 40, 40, 40, "mP", "" + i, "" + i, Keys.None, ""+i);
 				AddComponent(btn);
 			}
+		}
+
+		/// <summary>
+		/// Модальное окно выдало результат - значит надо его запустить
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OutEventStarted(object sender, EventArgs e)
+		{
+			// возможно, надо будет как то разделять события от разных модальных систем
+			//if (sender != this) return;// это событие должно генерироваться тут
+			Controller.AddToOperativeStore(DestroyEvent, this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -32,38 +51,34 @@ namespace SimpleMapEditor
 		protected Button EscButton;
 
 
-		public override void HandlersAdd()
+		protected override void HandlersAdder()
 		{
-			base.HandlersAdd();
-			Controller.AddEventHandler("modalPressed", modalPressed);
-			Controller.AddEventHandler(OutEvent + "Esc", EscPress);
+			base.HandlersAdder();
+			Controller.AddEventHandler(OutEvent, OutEventStarted);
+			Controller.AddEventHandler("mP", ModalPressed);
 		}
 
-		public override void HandlersRemove()
+		protected override void HandlersRemover()
 		{
-			Controller.RemoveEventHandler(OutEvent + "Esc", EscPress);
-			Controller.RemoveEventHandler("modalPressed", modalPressed);
-			base.HandlersRemove();
+			Controller.RemoveEventHandler(OutEvent, OutEventStarted);
+			Controller.RemoveEventHandler("mP", ModalPressed);
+			base.HandlersRemover();
 		}
 
 		/// <summary>
-		/// Нажали кнопку Esc значит закрываем диалог
+		/// Для остановки повторного нажатия на кнопки
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void EscPress(object sender, EventArgs e)
-		{
-			DeleteObject = true;
-		}
+		//private Boolean _stopRepeat = false;
 
-		private void modalPressed(object sender, EventArgs e)
+		private void ModalPressed(object sender, EventArgs e)
 		{
+			//TODO --->>>>>> проверить почему нажимается 2 раза
 			var s = sender as ViewObject;
 			if (s!=null){
 				name = s.Name;
 				ModalResult = Convert.ToInt32(name);
-				//EscButton.Press();
-				EscPress(this, e);
+				//Controller.AddToOperativeStore(OutEvent, this, EventArgs.Empty);
+				EscButton.Press();
 			}
 		}
 

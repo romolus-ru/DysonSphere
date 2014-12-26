@@ -14,6 +14,8 @@ namespace SimpleMapEditor
 {
 	class LayerSimpleEditableObject:Layer<SimpleEditableObject>
 	{
+		#region Переменные
+
 		/// <summary>
 		/// Размер блока
 		/// </summary>
@@ -47,13 +49,15 @@ namespace SimpleMapEditor
 		private int textureNum = 0;// номер текстуры
 		private bool _dragProcess;// перемещение при режимевключенном режиме перемещения 
 
+		#endregion
+
 		/// <summary>
 		/// Конструктор
 		/// </summary>
 		/// <param name="controller"></param>
 		/// <param name="layerName"></param>
-		/// <param name="viewLayer"></param>
 		/// <param name="data">Данные передаются извне - где то будет централизованное хранилище</param>
+		/// <param name="parent"></param>
 		public LayerSimpleEditableObject(Controller controller, string layerName, Dictionary<int, SimpleEditableObject> data,ViewComponent parent)
 			: base(controller, layerName, parent)
 		{
@@ -191,6 +195,7 @@ namespace SimpleMapEditor
 
 		protected override void DrawObject(VisualizationProvider vp)
 		{
+			base.DrawObject(vp);
 			vp.SetColor(Color.Green);
 			vp.Print(900, 350, "Режим");
 			vp.SetColor(Color.Yellow);
