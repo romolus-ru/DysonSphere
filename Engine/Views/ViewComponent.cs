@@ -48,7 +48,8 @@ namespace Engine.Views
 		{
 			Components.Add(component);
 			component.Parent = this;
-			component.HandlersAdd(); HandlersAdd() и тут и в init. где то лишний
+			component.HandlersAdd(); HandlersAdd() надо сделать обёртку над методом, который будет предотвращать повторное выполнение 
+				// в remove точно нужно вызывать, потому что объект могут изъять из одного компонента и подсадить к другому, поэтому независимо их нужно будет вызывать
 			component.Show();
 			component.Init(VisualizationProvider);
 		}
