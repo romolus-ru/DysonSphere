@@ -46,12 +46,15 @@ namespace Engine.Views
 			base.Cursor(o, args);
 			_cursorX = args.Pt.X;
 			_cursorY = args.Pt.Y;
+			var cOver = false;
 			if (Parent != null){
 				foreach (var component in Components){
+					if (cOver) break;
 					if (!component.CanDraw) continue; // компонент скрыт
 					var c = component as ViewControl;
 					if (c == null) continue;// компонент уровня контрол и умеет передавать событие курсора вложенным компонентам
 					c.DeliverCursorEH(o, args);
+					if (c.CursorOver) cOver = true;
 				}
 			}
 		}

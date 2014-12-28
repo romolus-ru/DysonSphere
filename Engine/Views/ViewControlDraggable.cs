@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Net.NetworkInformation;
 using Engine.Controllers;
 using Engine.Controllers.Events;
 
@@ -63,7 +64,7 @@ namespace Engine.Views
 		/// Сохраняемая координата курсора
 		/// </summary>
 		private int _cursorY;
-	
+
 		/// <summary>
 		/// Определяем то что зависит от перемещения курсора
 		/// </summary>
@@ -72,26 +73,37 @@ namespace Engine.Views
 		/// <remarks>На выходе получаем события, которые нужно переопределить - перемещение, дельта, координаты и т.п.</remarks>
 		public override void Cursor(object sender, PointEventArgs point)
 		{
-			Draggable.Cursor(sender, point);
-			if (Draggable.DragStarted)return;
-			base.Cursor(sender, point);// код взят из ViewControlSystem
-			_cursorX = point.Pt.X;
-			_cursorY = point.Pt.Y;
-			if (Parent != null)
-			{
-				foreach (var component in Components)
-				{
-					if (!component.CanDraw) continue; // компонент скрыт
-					var c = component as ViewControl;
-					if (c == null) continue;// компонент уровня контрол и умеет передавать событие курсора вложенным компонентам
-					c.DeliverCursorEH(sender, point);
+			var cOver = false;// что бы заблокировать cousorOver для 
+			if (!Draggable.DragStarted){
+				base.Cursor(sender, point); // код взят из ViewControlSystem
+				_cursorX = point.Pt.X - X;
+				_cursorY = point.Pt.Y - Y;
+				if (Parent != null){
+					foreach (var component in Components){
+						if (!component.CanDraw) continue; // компонент скрыт
+						var c = component as ViewControl;
+						if (c == null) continue; // компонент уровня контрол и умеет передавать событие курсора вложенным компонентам
+						var cpoint = PointEventArgs.Set(_cursorX, _cursorY);
+						c.DeliverCursorEH(sender, cpoint);
+						if (c.CursorOver) cOver = true;
+					}
 				}
 			}
+			if (!cOver)Draggable.Cursor(sender, point);
 		}
+
 		public override void Keyboard(object sender, InputEventArgs e)
 		{
 			base.Keyboard(sender, e);// на всякий случай вызываем этот метод
-			if (InRange(e.cursorX, e.cursorY)) Draggable.Keyboard(sender, e);
+			var cOver = false;// что бы заблокировать событие "клавиатуры" для контрола перемещения
+			foreach (var component in Components)
+			{
+				if (e.Handled) break; // если событие было обработано - выходим
+				if (!component.CanDraw) continue; // компонент скрыт
+				if (component.CursorOver) cOver = true;
+				component.Keyboard(sender, e);
+			}
+			if (!cOver && !e.Handled && InRange(e.cursorX, e.cursorY)) Draggable.Keyboard(sender, e);
 		}
 
 		/// <summary>

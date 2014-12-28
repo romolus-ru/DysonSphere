@@ -73,18 +73,11 @@ namespace Engine.Utils.Editor
 		/// </summary>
 		public String LayerName { get; set; }
 		
-		/// <summary>
-		/// На этом слое выводится объект
-		/// </summary>
-		public string ViewLayer { get; set; }
-
 		public bool CanStore { get; set; }
 
 		public Button AddButton(int x, int y, int width, int height, string eventName,
 			string caption, string hint, Keys key)
 		{
-			if (ViewLayer == "") { return null; }// нету имени слоя - выходим
-			// имя кнопки это её название
 			var btn = Button.CreateButton(Controller, x, y, width, height, eventName, caption, hint, key,caption);
 			AddComponent(btn);
 			return btn;

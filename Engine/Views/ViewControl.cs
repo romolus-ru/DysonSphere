@@ -32,12 +32,16 @@ namespace Engine.Views
 				return;
 			}
 			CursorOver = true;
+			if (Name == "UU")
+			{
+				var a2 = 0;
+			}
 			Cursor(o, a);
 			if (Components != null){
 				CursorOverOffed = false;
 				foreach (var component in Components){
 					component.CursorOver = false;
-					if (!component.InRange(a.Pt.X - X, a.Pt.Y - X)) continue; // компонент не в точке нажатия
+					if (!component.InRange(a.Pt.X - X, a.Pt.Y - Y)) continue; // компонент не в точке нажатия
 					component.CursorOver = true;
 					// TODO там может быть неправильная обработка - компонент содержит свои координаты относительно предыдущего объекта
 					component.Cursor(o, a);

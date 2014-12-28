@@ -63,16 +63,16 @@ namespace SimpleMapEditor
 		{
 			Data = data;
 			// добавляем кнопки (некоторые сохраняем, их нужно менять в процессе работы)
-			_addModeButton = AddButton(10, 720, 100, 20, "addNewObject", "Добавить",
+			_addModeButton = AddButton(10, 020, 100, 20, "addNewObject", "Добавить",
 				"Переключение режима добавления объекта", Keys.A);
-			_paintModeButton = AddButton(110, 720, 100, 20, "paintObject", "Красить",
+			_paintModeButton = AddButton(110, 020, 100, 20, "paintObject", "Красить",
 				"Переключение режима раскрашивания объектов", Keys.P);
-			_getInfoButton = AddButton(210, 720, 100, 20, "getInfoObject", "Копировать",
+			_getInfoButton = AddButton(210, 020, 100, 20, "getInfoObject", "Копировать",
 				"Режим копирования свойств объекта", Keys.C);
-			_moveObjectButton = AddButton(310, 720, 100, 20, "moveObject", "Переместить",
+			_moveObjectButton = AddButton(310, 020, 100, 20, "moveObject", "Переместить",
 							"Режим перемещения объекта", Keys.X);
-			AddButton(410, 720, 50, 20, "TexNumPrev", "<=", "Предыдущая текстурка", Keys.D);
-			AddButton(460, 720, 50, 20, "TexNumNext", "=>", "Следующая текстурка", Keys.F);
+			AddButton(410, 020, 50, 20, "TexNumPrev", "<=", "Предыдущая текстурка", Keys.D);
+			AddButton(460, 020, 50, 20, "TexNumNext", "=>", "Следующая текстурка", Keys.F);
 			
 			// добавляе обработчики для событий. так как это простые кнопки, то события чаще всего тоже почти стандартные
 			Controller.AddEventHandler("addNewObject", AddNewObject);
@@ -84,7 +84,7 @@ namespace SimpleMapEditor
 			Controller.AddEventHandler("TexNumNext", TexNumNext);
 			Controller.AddEventHandler("MapChangeMapPos", MapChangeMapPos);
 		}
-
+		
 		/// <summary>
 		/// Изменить положение центра карты по переданным координатам
 		/// </summary>
@@ -206,8 +206,7 @@ namespace SimpleMapEditor
 			vp.Print(900, 425, "" + (IsCanStartDrag?"Перемещение":"Запрет перемещения"));
 			vp.Print(900, 440, "" + (_dragProcess ? "Перемещаем" : "Не перемещаем"));
 			//vp.Print(900, 455, "" + (this.Parent.CanDraw ? "Видимый" : "Не видимый"));
-			foreach (var d in Data)
-			{
+			foreach (var d in Data){
 				var o = d.Value;
 				int x1 = o.X + MapX;
 				int y1 = o.Y + MapY;
@@ -218,7 +217,7 @@ namespace SimpleMapEditor
 				vp.SetColor(Color.White);
 				vp.DrawTexturePart(x1, y1, "main", 16, 16, o.TextureNum);
 			}
-			if (_targeted!=null){
+			if (_targeted != null && _mode == Modes.MoveObject){
 				vp.SetColor(Color.BurlyWood);
 				vp.Circle(_targeted.X + MapX, _targeted.Y + MapY, 18);
 				//vp.Line(CursorPoint.X, CursorPoint.Y, _targeted.X + MapX, _targeted.Y + MapY);
@@ -329,5 +328,10 @@ namespace SimpleMapEditor
 		/// <param name="y"></param>
 		/// <returns></returns>
 		protected int RoundY(int y){return ((y - MapY + blockH / 2) / blockW) * blockH;}
+
+		public override void Cursor(object sender, PointEventArgs point)
+		{
+			base.Cursor(sender, point);
+		}
 	}
 }
