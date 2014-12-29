@@ -190,6 +190,7 @@
 			// 
 			// btnDelElem
 			// 
+			this.btnDelElem.Enabled = false;
 			this.btnDelElem.Location = new System.Drawing.Point(200, 54);
 			this.btnDelElem.Name = "btnDelElem";
 			this.btnDelElem.Size = new System.Drawing.Size(75, 23);

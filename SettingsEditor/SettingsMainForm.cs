@@ -60,34 +60,25 @@ namespace SettingsEditor
 		private void btnScan_Click(object sender, EventArgs e)
 		{
 			if (_currentSettings == null) { return; }
+			var controller = new Controller();
+			var collector = new Collector(controller);
+			var typesForSearch = new List<Type> { typeof(VisualizationProvider), typeof(Module), typeof(Sound), typeof(Input) };
 			// получить файлы из текущей директории и записать их в файл настроек (желательно только в EngineSettings)
 			_currentSettings.ClearSection("files");// удаляем старые файлы
 			var dir = Application.StartupPath;
-			var files = Directory.GetFiles(dir, "*.exe");// dll
-			// но возможно придётся усложнить - ищем файлы и потом не показываем файлы, в которых нету модулей
-			// более того, если модулей несколько то можно позволить выбрать
-			foreach (var file in files)
-			{// добавляем новые файлы
+			var files = Directory.EnumerateFiles(dir, "*.*", SearchOption.AllDirectories)
+            .Where(s => s.EndsWith(".exe") || s.EndsWith(".dll"));
+			//var files = Directory.GetFiles(dir, "*.exe");// dll
+			foreach (var file in files){// добавляем новые файлы
 				var f = Path.GetFileName(file);// получаем только имя и если оно с "vshost" то пропускаем этот файл
 				if (f.EndsWith(".vshost.exe")) { continue; }
-
 				// делаем относительный путь, удаляя начальный путь к приложению
 				var file1 = file.Substring(Environment.CurrentDirectory.Length + 1);
-
-				_currentSettings.AddValue("assembly", f, "", "" + file1);
+				// если в сборке есть нужные типы классов, то сохраняем
+				if (collector.FindObjectsInAssembly(f, typesForSearch))
+					_currentSettings.AddValue("assembly", f, "", "" + file1);
 			}
-			FillListView();
 
-			// заполняем список коллектора
-			var typesForSearch = new List<Type> { typeof(VisualizationProvider), typeof(Module), typeof(Sound), typeof(Input) };
-			var controller = new Controller();
-			var collector = new Collector(controller);
-			var list1 = _currentSettings.Values;
-			var list2 = list1.Where(row => row.Section == "assembly").ToList();
-			foreach (var row in list2)
-			{
-				collector.FindObjectsInAssembly(row.Name, typesForSearch);
-			}
 			// получаем нужные данные и добавляем к списку выбора
 			cbRunModule.Items.Clear();
 			foreach (var module in collector.GetObjects(typeof(Module)))
@@ -137,7 +128,11 @@ namespace SettingsEditor
 
 		private void btnEdit_Click(object sender, EventArgs e)
 		{
-			if (listView1.SelectedItems.Count < 1) return;
+			if (listView1.SelectedItems.Count < 1)
+			{
+				MessageBox.Show(this,@"Надо выбрать строку настройки для редактирования", @"", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+				return;
+			}
 			var a = listView1.SelectedItems[0];
 			if (a == null) return;
 			var b = _currentSettings.SearchRow(a.Text, a.SubItems[1].Text);

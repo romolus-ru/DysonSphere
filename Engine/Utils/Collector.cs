@@ -56,33 +56,34 @@ namespace Engine.Utils
 		/// </summary>
 		/// <param name="assemblyFile">Файл сборки</param>
 		/// <param name="types">список типов, которые надо найти</param>
-		public void FindObjectsInAssembly(string assemblyFile, IEnumerable<Type> types)
+		public Boolean FindObjectsInAssembly(string assemblyFile, IEnumerable<Type> types)
 		{
 			Assembly assembly; // объявляем сборку
 			// ищем имя сборки чтоб её загрузить
-			if (!File.Exists(assemblyFile)){
-				return;
-			}
-			AssemblyName assemblyName = AssemblyName.GetAssemblyName(assemblyFile);
+			if (!File.Exists(assemblyFile)){return false;}
 			// пробуем загрузить
 			try{
+				AssemblyName assemblyName = AssemblyName.GetAssemblyName(assemblyFile);
 				assembly = Assembly.Load(assemblyName);
 			}
-			catch (Exception e){
-				// если не загрузилось то показываем что к чему
+			catch (Exception e){// если не загрузилось то показываем что к чему
 				var ea = MessageEventArgs.Msg("Ошибка при загрузке сборки " +
 					assemblyFile + Environment.NewLine + e.Message + Environment.NewLine + e.GetType());
 				_errorEvent.StartEvent(null, ea);
-				return; // и выходим
+				return false; // и выходим
 			}
-
+			var ret = false;
 			// ищем нужные типы в объектах и сохраняем их для последующего использования
 			foreach (Type type in types){
-				if (type.IsInterface)
-					SearchObjectsWithInterface(assembly, type);
-				else
-					SearchObjects(assembly, type);
+				if (type.IsInterface){
+					var r=SearchObjectsWithInterface(assembly, type);
+					if (r) ret = true;
+				}else{
+					var r=SearchObjects(assembly, type); 
+					if (r) ret = true;
+				}
 			}
+			return ret;
 		}
 
 		/// <summary>
@@ -90,8 +91,10 @@ namespace Engine.Utils
 		/// </summary>
 		/// <param name="assembly">Сборка</param>
 		/// <param name="interfaceType">интерфейс</param>
-		private void SearchObjectsWithInterface(Assembly assembly, Type interfaceType)
+		/// <returns>Есть ли хоть один интерфейс в сборке</returns>
+		private Boolean SearchObjectsWithInterface(Assembly assembly, Type interfaceType)
 		{
+			var ret = false;
 			Type[] types = assembly.GetTypes();
 			foreach (var type in types){
 				if (type == interfaceType) continue;
@@ -99,8 +102,10 @@ namespace Engine.Utils
 				if (ExistInterface(type, interfaceType)){
 					// интерфейс есть, надо добавлять
 					AddTypeToObjects(interfaceType, type);
+					ret = true;
 				}
 			}
+			return ret;
 		}
 
 		/// <summary>
@@ -108,8 +113,9 @@ namespace Engine.Utils
 		/// </summary>
 		/// <param name="assembly">Сборка</param>
 		/// <param name="objectType">Родительский тип</param>
-		private void SearchObjects(Assembly assembly, Type objectType)
+		private Boolean SearchObjects(Assembly assembly, Type objectType)
 		{
+			var ret = false;
 			Type[] types = assembly.GetTypes();
 			var pE = from pe in types where pe != objectType select pe;// исключаем только родительский тип, чтоб ошибок небыло, да и они почти абстрактные
 			//var pE = from pe in types where !pe.IsEnum select pe;
@@ -136,9 +142,10 @@ namespace Engine.Utils
 						HideThisClassAttribute att = (HideThisClassAttribute)Attribute.GetCustomAttribute(type, typeObjName);
 						if (att.HideThisObject) addType = false;
 					}
-					if (addType) AddTypeToObjects(objectType, type);
+					if (addType) {AddTypeToObjects(objectType, type);ret = true;}
 				}
 			}
+			return ret;
 		}
 
 		/// <summary>
