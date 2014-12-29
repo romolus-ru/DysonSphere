@@ -150,7 +150,7 @@
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnOk);
 			this.Name = "SettingsEditForm";
-			this.Text = "SettingsEditForm";
+			this.Text = "Редактирование записи настройки";
 			this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.SettingsEditForm_KeyUp);
 			this.ResumeLayout(false);
 			this.PerformLayout();

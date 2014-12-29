@@ -278,7 +278,7 @@
 			this.Controls.Add(this.btnSave);
 			this.Controls.Add(this.btnLoad);
 			this.Name = "SettingsMainForm";
-			this.Text = "Form1";
+			this.Text = "Редактор настроек";
 			this.Load += new System.EventHandler(this.SettingsMainForm_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();

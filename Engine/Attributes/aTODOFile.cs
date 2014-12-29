@@ -10,7 +10,7 @@
 
 // напоминает паттерн посетитель или action. второй вроде лучше
 
-// 
+// по возможности со временем перейти на ApplicationSettings http://msdn.microsoft.com/ru-ru/library/ms171565.aspx
 
 
 

@@ -5,6 +5,7 @@ using Engine;
 using Engine.Controllers;
 using Engine.Views;
 using Engine.Utils.Editor;
+using Engine.Views.Templates;
 using Button = Engine.Views.Templates.Button;
 
 namespace SimpleMapEditor
@@ -62,6 +63,8 @@ namespace SimpleMapEditor
 			window2.SetSize(100, 50);
 			//window2.Name = "w2";
 			//sys.AddComponent(window2);
+			//var background = new Background(controller);
+			//view.AddObject(background);
 		}
 
 		/*private void ModalInputResult(object sender, EventArgs e)

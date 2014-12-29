@@ -208,10 +208,18 @@ namespace Engine.Utils.Settings
 			}
 			catch (Exception)
 			{
-				settings.AddValue("", "", "100", "test");
-				settings.AddValue("MainSettings", "settingsFile", "settings.xml", "Местоположение файла настроек");
-				settings.AddValue("WindowOptions", "windowWidth", "1024", "Ширина окна");
+				settings.AddValue("assembly", "Engine.exe", "", "Engine.exe");
+				settings.AddValue("assembly", "PathTester.dll", "", "PathTester.dll");
+				settings.AddValue("assembly", "SettingsEditor.exe", "", "SettingsEditor.exe");
+				settings.AddValue("assembly", "SimpleMapEditor.dll", "", "SimpleMapEditor.dll");
+				settings.AddValue("assembly", "VisualizationDefault.dll", "", "VisualizationDefault.dll");
+				settings.AddValue("assembly", "VisualizationOpenGL4.dll", "", "VisualizationOpenGL4.dll");
+				settings.AddValue("Default", "Input", "VisualizationOpenGL4.OpenGLInput", "");
+				settings.AddValue("Default", "Module", "SimpleMapEditor.SimpleMapEditor", "");
+				settings.AddValue("Default", "Visualization", "VisualizationOpenGL4.VisualizationOpenGL4", "");
+				settings.AddValue("MainSettings", "settingsFile", "settings.xml", "Местоположение файла настроек");// оставлено длясовместимости, но вроде нигде не нужно
 				settings.AddValue("WindowOptions", "windowHeight", "768", "Высота окна");
+				settings.AddValue("WindowOptions", "windowWidth", "1024", "Ширина окна");
 			}
 			return settings;
 		}

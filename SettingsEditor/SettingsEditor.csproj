@@ -87,9 +87,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">
       <Project>{61c43545-2ffa-4e9c-8708-2fdc0de50361}</Project>
       <Name>Engine</Name>
