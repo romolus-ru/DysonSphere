@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Text;
 using System.Windows.Forms;
 using Engine;
 using Engine.Controllers.Events;
@@ -21,6 +23,17 @@ namespace VisualizationOpenGL4
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool GetKeyboardState(byte[] lpKeyState);
 
+		[DllImport("user32.dll")]
+		static extern IntPtr GetKeyboardLayout(uint idThread);
+
+		[DllImport("user32.dll")]
+		static extern uint MapVirtualKeyEx(uint uCode, uint uMapType, IntPtr dwhkl);
+
+		[DllImport("user32.dll")]
+		static extern int ToUnicodeEx(uint wVirtKey, uint wScanCode, byte[]
+		   lpKeyState, [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pwszBuff,
+		   int cchBuff, uint wFlags, IntPtr dwhkl);
+
 		/// <summary>
 		/// массив с нажатыми кнопками. никому недоступен
 		/// </summary>
@@ -35,15 +48,38 @@ namespace VisualizationOpenGL4
 			Boolean ret = false;
 			GetKeyboardState(_keys);
 			// проходим по первой половине массива
-			for (int i = 0; i < 128; i++)
-			{
+			for (int i = 0; i < 256; i++){
 				// если старший бит установлен, то 
 				if ((_keys[i] & 0x80) == 0) continue;
-				//_controller.StartEvent("ViewStringListAdd", this, MessageEventArgs.Msg("Кнопка " + i + " значение " + _keys[i]));
 				ret = true;
 				break;
 			}
 			return ret;
+
+
+			/*byte[] keyboardState = new byte[256];
+			GetKeyboardState(keyboardState);
+			IntPtr handle = GetKeyboardLayout(0);
+			uint scanCode = MapVirtualKeyEx(VirtualKeyCode, 0, handle);
+			StringBuilder stringBuilder = new StringBuilder(2);
+
+			int nResultLower = ToUnicodeEx(VirtualKeyCode, scanCode, keyboardState, stringBuilder,
+												   stringBuilder.Capacity, 0, handle);
+
+			string output = string.Empty;
+			if (nResultLower != 0)
+			{
+				output = stringBuilder.ToString();
+			}
+			*/
+
+
+
+
+
+
+
+
 		}
 
 		/// <summary>
@@ -85,6 +121,41 @@ namespace VisualizationOpenGL4
 				ret = true;
 			}
 			return ret;
+		}
+
+		public override string KeysToUnicode()
+		{
+			var s = "";
+			//foreach (Keys key in Enum.GetValues(typeof(Keys)))// getvalues не повзращает уникальные значения, они могут повторяться
+			for (uint keyUInt = 0; keyUInt < 256; keyUInt++)
+			{
+				Keys key = (Keys) keyUInt;
+				if (!isKeyPressed(key)) continue;
+				if (key == Keys.Back) continue;
+				var s1 = KeysToUnicode(keyUInt);
+				s += s1;
+			}
+			return s;
+		}
+
+		private string KeysToUnicode(uint key)
+		{
+			// http://www.pinvoke.net/default.aspx/user32.ToUnicodeEx
+			// http://stackoverflow.com/questions/1164172/intercept-keyboard-input-using-current-keyboard-layout
+			IntPtr handle = GetKeyboardLayout(0);
+			uint scanCode = MapVirtualKeyEx(key, 0, handle);
+			StringBuilder stringBuilder = new StringBuilder(2);
+
+			int nResultLower = ToUnicodeEx(key, scanCode, _keys, stringBuilder,
+												   stringBuilder.Capacity, 0, handle);
+
+			string output = String.Empty;
+			if (nResultLower > 0)
+			{
+				output = stringBuilder.ToString();
+				output = output.Substring(0, nResultLower);
+			}
+			return output;
 		}
 	}
 }

@@ -23,6 +23,11 @@ namespace Engine.Controllers.Events
 			input.KeyboardClear(this, Empty);
 		}
 
+		public string KeyToUnicode()
+		{
+			return input.KeysToUnicode();
+		}
+
 		#region Координаты курсора. Экранные. Возможно, неправильное использование - Координаты берутся из другого источника
 
 		/// <summary>

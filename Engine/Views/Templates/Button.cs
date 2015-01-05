@@ -86,7 +86,7 @@ namespace Engine.Views.Templates
 				txt = " " + Caption + " ";
 				visualizationProvider.SetColor(Color.Green);
 			}
-			visualizationProvider.Print(X + 10, Y + 2, txt);
+			visualizationProvider.Print(X + 4, Y - 3, txt);
 			visualizationProvider.Rectangle(X, Y, Width, Height);
 			if (Hint != "" && CursorOver){
 				visualizationProvider.Print(X + 10, Y + Height + 5, Hint);

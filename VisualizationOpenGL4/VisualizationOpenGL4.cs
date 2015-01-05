@@ -560,8 +560,9 @@ namespace VisualizationOpenGL4
 
 		private int TextLength(byte[] text)
 		{
-			float len = text.Sum(с => glyphMetrics[с].gmfCellIncX);
-			return (int)(len * FontHeight + 0.5f);
+			// 1.22 выявлена опытным путём, в дальнейшем может быть изменена
+			float len = text.Sum(с => (glyphMetrics[с].gmfCellIncX * FontHeight * 1.22f));
+			return (int) (len);// + 0.5f);
 		}
 
 		public override int TextLength(string text)

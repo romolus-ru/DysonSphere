@@ -10,11 +10,11 @@ namespace Engine.Views
 {
 	public class ViewModalInput:ViewModal
 	{
-		private String _text;
-		private String _value;
+		protected String _text;
+		protected String _value;
 
-		public ViewModalInput(Controller controller, string outEvent, string destroyEvent, string value)
-			: base(controller, null, outEvent,destroyEvent)
+		public ViewModalInput(Controller controller, ViewComponent parent, string outEvent, string destroyEvent, string value)
+			: base(controller, parent, outEvent,destroyEvent)
 		{
 			_text = value;
 			_value = value;

@@ -191,7 +191,7 @@ namespace SettingsEditor
 		private void cbSound_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			return;// не работаем пока со звуком
-			var b = _currentSettings.SearchRow("Default", "Sound");
+			/*var b = _currentSettings.SearchRow("Default", "Sound");
 			var a = cbSound.SelectedItem;
 			if (a == null) return;
 			if (b == null)
@@ -200,7 +200,7 @@ namespace SettingsEditor
 				_currentSettings.AddValue(b);
 			}
 			b.Value = a.ToString();
-			FillListView();
+			FillListView();*/
 		}
 
 		private void cbInput_SelectedIndexChanged(object sender, EventArgs e)

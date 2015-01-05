@@ -87,21 +87,23 @@ namespace Engine.Views
 		{
 			var sLButton = _stateLButton.Check(e.IsKeyPressed(Keys.LButton));
 			if (DragStarted){// кнопка не нажата, значит формируем сигнал о завершении перемещения
-				e.Handled = true;
 				if (sLButton == StatesEnum.Off){
 					OnDragEnd(CursorPointFrom.X - e.cursorX, CursorPointFrom.Y - e.cursorY);
 					DragStarted = false;
 				}
+				e.Handled = true;
 				return;
 			}
 			if (sLButton==StatesEnum.On){
 				CursorPointFrom = new Point(e.cursorX, e.cursorY);
 				if (IsCanStartDrag){
 					DragStarted = true;// активируем перемещение и сохраняем текущие координаты
+					e.Handled = true;
 					OnDragStart(CursorPointFrom.X, CursorPointFrom.Y);
 				}
 				OnMouseClick(e.cursorX, e.cursorY,DragStarted);
 			}
+			if (!DragStarted) _stateLButton.Check(false);// сбрасываем
 		}
 
 		/// <summary>

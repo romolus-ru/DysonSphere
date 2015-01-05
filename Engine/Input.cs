@@ -174,5 +174,13 @@ namespace Engine
 		/// <returns></returns>
 		public virtual bool isKeyPressed(Keys key) { return false; }
 
+		/// <summary>
+		/// Преобразовывает код нажатой клавиши на клавиатуре в код с учётом текущей раскладки клавиатуры
+		/// </summary>
+		/// <returns></returns>
+		public virtual String KeysToUnicode()
+		{
+			return String.Empty;
+		}
 	}
 }

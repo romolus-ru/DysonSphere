@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Engine;
 using Engine.Controllers;
 using Engine.Controllers.Events;
+using Engine.Utils;
 using Engine.Utils.Editor;
 using Engine.Views;
 using Button = Engine.Views.Templates.Button;
@@ -15,6 +16,11 @@ namespace SimpleMapEditor
 	class LayerSimpleEditableObject:Layer<SimpleEditableObject>
 	{
 		#region Переменные
+
+		/// <summary>
+		/// Пауза что бы некоторые обработчики сразу не срабатывали
+		/// </summary>
+		private StateOneTime _StartPause = StateOneTime.Init(3);
 
 		/// <summary>
 		/// Размер блока
@@ -118,7 +124,7 @@ namespace SimpleMapEditor
 		public override void Init(VisualizationProvider visualizationProvider)
 		{
 			base.Init(visualizationProvider);
-			visualizationProvider.LoadTexture("main", @"..\Resources\defanceLabirinth.jpg");// грузим текстуру основную
+			visualizationProvider.LoadTexture("main", @"..\Resources\defanceLabirinth.jpg");// грузим основную текстуру 
 			SetCoordinates(0,0,0);
 			SetSize(visualizationProvider.CanvasWidth, visualizationProvider.CanvasHeight);
 		}
@@ -158,7 +164,7 @@ namespace SimpleMapEditor
 		}
 
 		/// <summary>
-		/// Режим полученияя информации об объекте
+		/// Режим получения информации об объекте
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -196,17 +202,18 @@ namespace SimpleMapEditor
 		protected override void DrawObject(VisualizationProvider vp)
 		{
 			base.DrawObject(vp);
-			vp.SetColor(Color.Green);
-			vp.Print(900, 350, "Режим");
-			vp.SetColor(Color.Yellow);
-			vp.Print(900, 365, ""+_mode);
+			vp.SetColor(Color.AntiqueWhite);
+			vp.Print(900, 365, "" + _mode);
 			vp.Print(900, 380, " M(" + MapX+","+MapY+")");
 			vp.Print(900, 395, " C(" + CursorPoint.X + "," + CursorPoint.Y + ")");
 			vp.Print(900, 410, "CF(" + CursorPointFrom.X + "," + CursorPointFrom.Y + ")");
-			vp.Print(900, 425, "" + (IsCanStartDrag?"Перемещение":"Запрет перемещения"));
+			vp.Print(900, 425, "" + (IsCanStartDrag ? "Перемещение" : "Запрет перемещения"));
 			vp.Print(900, 440, "" + (_dragProcess ? "Перемещаем" : "Не перемещаем"));
 			//vp.Print(900, 455, "" + (this.Parent.CanDraw ? "Видимый" : "Не видимый"));
-			foreach (var d in Data){
+			vp.Print(810, 455, "Тип " + ObjectTypeAtlas.GetTextureNum((ObjectTypes)textureNum));
+			vp.Print(810, 470, "Название " + ObjectTypeAtlas.GetDescription((ObjectTypes)textureNum));
+			foreach (var d in Data)
+			{
 				var o = d.Value;
 				int x1 = o.X + MapX;
 				int y1 = o.Y + MapY;
@@ -315,23 +322,15 @@ namespace SimpleMapEditor
 			}
 		}
 
-		/// <summary>
-		/// Округлить координаты по блокам
-		/// </summary>
+		/// <summary>Округлить координаты по блокам</summary>
 		/// <param name="x"></param>
 		/// <returns></returns>
 		protected int RoundX(int x){return ((x - MapX + blockW / 2) / blockH) * blockW;}
 
-		/// <summary>
-		/// Округлить координаты по блокам
-		/// </summary>
+		/// <summary>Округлить координаты по блокам</summary>
 		/// <param name="y"></param>
 		/// <returns></returns>
 		protected int RoundY(int y){return ((y - MapY + blockH / 2) / blockW) * blockH;}
 
-		public override void Cursor(object sender, PointEventArgs point)
-		{
-			base.Cursor(sender, point);
-		}
 	}
 }

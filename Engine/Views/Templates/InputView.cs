@@ -17,7 +17,7 @@ namespace Engine.Views.Templates
 	/// для ввода данных нужно кликнуть на строке, это будет сигналом к началу перехвата команд
 	/// По идее если пользователь нажал за пределами поля редактирования то это может тоже означать завершение редактирования
 	/// </remarks>
-	public class InputView:ViewComponent
+	public class InputView:ViewModalInput
 	{
 		/// <summary>
 		/// Редактируемый текст
@@ -58,16 +58,20 @@ namespace Engine.Views.Templates
 		/// Конструктор
 		/// </summary>
 		/// <param name="controller"></param>
-		public InputView(Controller controller,ViewComponent parent): base(controller,parent)
+		/// <param name="outEvent"></param>
+		/// <param name="destroyEvent"></param>
+		/// <param name="value"></param>
+		public InputView(Controller controller, ViewComponent parent, string outEvent, string destroyEvent, string value)
+			: base(controller, parent, outEvent, destroyEvent, value)
 		{
+			blockers = new Dictionary<Keys, StateOne>();
 			blockers.Add(Keys.LButton, StateOne.Init());
 			blockers.Add(Keys.Escape, StateOne.Init());
 			blockers.Add(Keys.Enter, StateOne.Init());
 			for (Keys i = Keys.A; i < Keys.Z; i++){
 				blockers.Add(i, StateOneTime.Init(View.Pause));
 			}
-
-			Controller.AddEventHandler("InputActivate", ActivateInput);
+			Text = value;
 		}
 
 		/// <summary>
@@ -161,5 +165,16 @@ namespace Engine.Views.Templates
 			visualizationProvider.Print(X + 10, Y + 10, txt);
 		}
 
+		protected override void HandlersAdder()
+		{
+			base.HandlersAdder();
+			Controller.AddEventHandler("InputActivate", ActivateInput);
+		}
+
+		protected override void HandlersRemover()
+		{
+			Controller.RemoveEventHandler("InputActivate", ActivateInput);
+			base.HandlersRemover();
+		}
 	}
 }

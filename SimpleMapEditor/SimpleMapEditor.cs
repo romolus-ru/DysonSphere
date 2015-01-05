@@ -20,6 +20,7 @@ namespace SimpleMapEditor
 		private LayerSimpleEditableObjectMap l2;
 		private Boolean ShowMap = false;
 		private ViewModalSelectFile selectFile;
+		private ViewModalInputName InputString;
 		private ViewWindow window2;
 		private ViewModalInput input;
 
@@ -40,6 +41,7 @@ namespace SimpleMapEditor
 			sys.AddComponent(Button.CreateButton(controller, 800, 720, 100, 20, "SimpleLoad", "Загрузить", "L", Keys.L,""));
 			sys.AddComponent(Button.CreateButton(controller, 950, 25, 74, 20, "MapView", "Карта", "Просмотр карты", Keys.M,""));
 			sys.AddComponent(Button.CreateButton(controller, 950, 55, 74, 20, "ModalStart", "Modal", "Модальный запрос", Keys.H,""));
+			sys.AddComponent(Button.CreateButton(controller, 900, 85, 130, 20, "ModalInput", "ModalInput", "Ввод текста", Keys.I, "modalInput"));
 			
 			CreateEditor();
 			var s = new SimpleEditableObject();
@@ -54,6 +56,9 @@ namespace SimpleMapEditor
 			Controller.AddEventHandler("ModalStart", ModalStart);
 			Controller.AddEventHandler("ModalResult", ModalResult);
 			Controller.AddEventHandler("ModalDestroy", ModalDestroy);
+			Controller.AddEventHandler("ModalInput", ModalInput);
+			Controller.AddEventHandler("ModalInputResult", ModalInputResult);
+			Controller.AddEventHandler("ModalInputDestroy", ModalInputDestroy);
 
 			//Controller.AddEventHandler("ModalInputStart", ModalInputStart);
 			//Controller.AddEventHandler("ModalInputClosed", ModalInputResult);
@@ -103,7 +108,31 @@ namespace SimpleMapEditor
 			selectFile = new ViewModalSelectFile(Controller,null, "ModalClosed","ModalDestroy");
 			sys.AddComponent(selectFile);
 		}
+
+		private void ModalInputResult(object sender, EventArgs e)
+		{
+			var m = sender as ViewModalInput;
+			if (m != null)
+			{
+				var s = m.GetResult();
+			}
+		}
+
+		private void ModalInputDestroy(object sender, EventArgs e)
+		{
+			sys.Remove(InputString);
+			InputString.Dispose();
+			InputString = null;
+		}
 		
+		private void ModalInput(object sender, EventArgs e)
+		{
+			InputString = new ViewModalInputName(Controller, null, "ModalInputClosed", "ModalInputDestroy","строка");
+			InputString.SetSize(300, 50);
+			InputString.SetCoordinates(100, 100, 0);
+			sys.AddComponent(InputString);
+		}
+
 		/// <summary>
 		/// Переключение режима просмотра карты
 		/// </summary>

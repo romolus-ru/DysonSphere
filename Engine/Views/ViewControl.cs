@@ -32,10 +32,6 @@ namespace Engine.Views
 				return;
 			}
 			CursorOver = true;
-			if (Name == "UU")
-			{
-				var a2 = 0;
-			}
 			Cursor(o, a);
 			if (Components != null){
 				CursorOverOffed = false;
