@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Engine;
 using Engine.Controllers;
+using Engine.Controllers.Events;
 using Engine.Views;
 using Engine.Utils.Editor;
 using Engine.Views.Templates;
@@ -17,12 +18,16 @@ namespace SimpleMapEditor
 		private Boolean _newObjClick;
 		private Dictionary<int, SimpleEditableObject> data = new Dictionary<int, SimpleEditableObject>();
 		private LayerSimpleEditableObject l1;
-		private LayerSimpleEditableObjectMap l2;
-		private Boolean ShowMap = false;
+		private LayerSimpleEditableObjectView l2;
+		private LayerSimpleEditableObjectMove l3;
+		private LayerSimpleEditableObjectTeleport l4;
+		private LayerSimpleEditableObjectMap l9;
+		private int currLayer = 0;//переключение между слоями редактора
 		private ViewModalSelectFile selectFile;
 		private ViewModalInputName InputString;
 		private ViewWindow window2;
 		private ViewModalInput input;
+		private ShowMsg ShowMsg;
 
 		private ViewControlSystem sys;
 
@@ -39,7 +44,7 @@ namespace SimpleMapEditor
 
 			sys.AddComponent(Button.CreateButton(controller, 900, 720, 100, 20, "SimpleSave", "Сохранить", "S", Keys.S,""));
 			sys.AddComponent(Button.CreateButton(controller, 800, 720, 100, 20, "SimpleLoad", "Загрузить", "L", Keys.L,""));
-			sys.AddComponent(Button.CreateButton(controller, 950, 25, 74, 20, "MapView", "Карта", "Просмотр карты", Keys.M,""));
+			sys.AddComponent(Button.CreateButton(controller, 900, 25, 130, 20, "MapView", "Смена слоя", "Активировать другой слой редактора", Keys.M,""));
 			sys.AddComponent(Button.CreateButton(controller, 950, 55, 74, 20, "ModalStart", "Modal", "Модальный запрос", Keys.H,""));
 			sys.AddComponent(Button.CreateButton(controller, 900, 85, 130, 20, "ModalInput", "ModalInput", "Ввод текста", Keys.I, "modalInput"));
 			
@@ -70,6 +75,7 @@ namespace SimpleMapEditor
 			//sys.AddComponent(window2);
 			//var background = new Background(controller);
 			//view.AddObject(background);
+			ShowMsg=new ShowMsg(controller,sys);
 		}
 
 		/*private void ModalInputResult(object sender, EventArgs e)
@@ -140,17 +146,18 @@ namespace SimpleMapEditor
 		/// <param name="e"></param>
 		private void MapView(object sender, EventArgs e)
 		{
-			ShowMap = !ShowMap;
-			if (ShowMap){
-				_editor.SetActiveLayer("Map");
-				//l1.ActiveHandlers = false;
-				//l2.ActiveHandlers = true;
-			}
-			else{
-				_editor.SetActiveLayer("objects");
-				//l1.ActiveHandlers = true;
-				//l2.ActiveHandlers = false;
-			}
+			currLayer++;
+			if (currLayer > 4) currLayer = 0;
+			if (currLayer == 0) { _editor.SetActiveLayer("objects"); l1.SynhronizeMapCoords(l4.MapX, l4.MapY);Msg("Режим : Основной");}
+			if (currLayer == 1) { _editor.SetActiveLayer("objectsView"); l2.SynhronizeMapCoords(l1.MapX, l1.MapY);Msg("Режим : установка дополнительных текстур"); }
+			if (currLayer == 2) { _editor.SetActiveLayer("objectsMove"); l3.SynhronizeMapCoords(l2.MapX, l2.MapY);Msg("Режим : редактирование перемещения"); }
+			if (currLayer == 3) { _editor.SetActiveLayer("objectsTeleport"); l4.SynhronizeMapCoords(l3.MapX, l3.MapY);Msg("Режим : редактирование телепортов"); }
+			if (currLayer == 4) { _editor.SetActiveLayer("Map");Msg("Режим : карта"); }
+		}
+
+		private void Msg(String s)
+		{
+			Controller.StartEvent("ShowMsg", this, MessageEventArgs.Msg(s));
 		}
 
 		private void Load(object sender, EventArgs e)
@@ -162,7 +169,7 @@ namespace SimpleMapEditor
 		}
 
 		/// <summary>
-		/// Создаём редактор и иниализируем что ещё нужно
+		/// Создаём редактор и иницализируем что ещё нужно
 		/// </summary>
 		private void CreateEditor()
 		{
@@ -173,19 +180,24 @@ namespace SimpleMapEditor
 				_editor = new editor(Controller, sys);
 				_editor.Show();
 				l1 = new LayerSimpleEditableObject(Controller, "objects", data,_editor);
-				l2 = new LayerSimpleEditableObjectMap(Controller, "Map", data,_editor);
+				l2 = new LayerSimpleEditableObjectView(Controller, "objectsView", data, _editor);
+				l3 = new LayerSimpleEditableObjectMove(Controller, "objectsMove", data, _editor);
+				l4 = new LayerSimpleEditableObjectTeleport(Controller, "objectsTeleport", data, _editor);
+				l9 = new LayerSimpleEditableObjectMap(Controller, "Map", data, _editor);
 				_editor.AddNewLayer(l1);
 				_editor.AddNewLayer(l2);
-				// TODO !!!!!!!!!!!!!!!!!! события по прежнему не срабатывают. в том числе нужно переделать проверку
-				//_editor.SetCurrentLayer("objects");
-				// вроде не нужно, слой должен сам их выводить
-				//_controller.ViewAddObjectCommand(this, EditorLayer, l1);
-				//_controller.ViewAddObjectCommand(this, EditorLayer, l2);
-			}// а после этого просто очищаем то что было
-			//l1.ActiveHandlers = true; // должен вызываться последним
-			//l2.ActiveHandlers = false;
+				_editor.AddNewLayer(l3);
+				_editor.AddNewLayer(l4);
+				_editor.AddNewLayer(l9);
+			}
+			l9.CanStore = false;
+			l9.Hide();
 			l2.CanStore = false;
 			l2.Hide();
+			l3.CanStore = false;
+			l3.Hide();
+			l4.CanStore = false;
+			l4.Hide();
 			_editor.SetActiveLayer("objects");
 			data.Clear();
 		}

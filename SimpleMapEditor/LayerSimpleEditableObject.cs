@@ -22,14 +22,12 @@ namespace SimpleMapEditor
 		/// </summary>
 		private StateOneTime _StartPause = StateOneTime.Init(3);
 
-		/// <summary>
-		/// Размер блока
-		/// </summary>
-		protected const int blockH = 16;
-		/// <summary>
-		/// Размер блока
-		/// </summary>
-		protected const int blockW = 16;
+		/// <summary>Размер блока</summary>
+		public const int blockH = 32;
+		/// <summary>Размер блока</summary>
+		public const int blockW = 32;
+		/// <summary>Количество блоков</summary>
+		public const int countBlocks = 23;
 
 		private Button _addModeButton;
 		private Button _paintModeButton;
@@ -52,8 +50,8 @@ namespace SimpleMapEditor
 
 		private int x1OldCreated = -9473;
 		private int y1OldCreated = -14748;
-		private int textureNum = 0;// номер текстуры
-		private bool _dragProcess;// перемещение при режимевключенном режиме перемещения 
+		private ObjectTypes textureNum = ObjectTypes.Empty;// номер текстуры
+		private bool _dragProcess;// перемещение при включенном режиме перемещения 
 
 		#endregion
 
@@ -80,7 +78,7 @@ namespace SimpleMapEditor
 			AddButton(410, 020, 50, 20, "TexNumPrev", "<=", "Предыдущая текстурка", Keys.D);
 			AddButton(460, 020, 50, 20, "TexNumNext", "=>", "Следующая текстурка", Keys.F);
 			
-			// добавляе обработчики для событий. так как это простые кнопки, то события чаще всего тоже почти стандартные
+			// добавляем обработчики для событий. так как это простые кнопки, то события чаще всего тоже почти стандартные
 			Controller.AddEventHandler("addNewObject", AddNewObject);
 			Controller.AddEventHandler("paintObject", PaintObject);
 			Controller.AddEventHandler("getInfoObject", GetInfoObject);
@@ -108,7 +106,7 @@ namespace SimpleMapEditor
 		private void TexNumNext(object sender, EventArgs e)
 		{
 			textureNum++;
-			if (textureNum>15){
+			if ((int)textureNum > countBlocks){
 				textureNum = 0;
 			}
 		}
@@ -117,14 +115,14 @@ namespace SimpleMapEditor
 		{
 			textureNum--;
 			if (textureNum<0){
-				textureNum = 15;
+				textureNum = (ObjectTypes)countBlocks;
 			}
 		}
 
 		public override void Init(VisualizationProvider visualizationProvider)
 		{
 			base.Init(visualizationProvider);
-			visualizationProvider.LoadTexture("main", @"..\Resources\defanceLabirinth.jpg");// грузим основную текстуру 
+			visualizationProvider.LoadTexture("mainEdit", @"..\Resources\defanceLabirinth2.jpg");// грузим основную текстуру 
 			SetCoordinates(0,0,0);
 			SetSize(visualizationProvider.CanvasWidth, visualizationProvider.CanvasHeight);
 		}
@@ -201,7 +199,6 @@ namespace SimpleMapEditor
 
 		protected override void DrawObject(VisualizationProvider vp)
 		{
-			base.DrawObject(vp);
 			vp.SetColor(Color.AntiqueWhite);
 			vp.Print(900, 365, "" + _mode);
 			vp.Print(900, 380, " M(" + MapX+","+MapY+")");
@@ -210,34 +207,47 @@ namespace SimpleMapEditor
 			vp.Print(900, 425, "" + (IsCanStartDrag ? "Перемещение" : "Запрет перемещения"));
 			vp.Print(900, 440, "" + (_dragProcess ? "Перемещаем" : "Не перемещаем"));
 			//vp.Print(900, 455, "" + (this.Parent.CanDraw ? "Видимый" : "Не видимый"));
-			vp.Print(810, 455, "Тип " + ObjectTypeAtlas.GetTextureNum((ObjectTypes)textureNum));
-			vp.Print(810, 470, "Название " + ObjectTypeAtlas.GetDescription((ObjectTypes)textureNum));
+			var objectTypes = (ObjectTypes)textureNum;
+			var num = ObjectTypeAtlas.GetTextureNum(objectTypes);
+			vp.Print(810, 455, "Тип " + num+" "+objectTypes.ToString());
+			vp.Print(810, 470, "Название " + ObjectTypeAtlas.GetDescription(objectTypes));
 			foreach (var d in Data)
 			{
 				var o = d.Value;
 				int x1 = o.X + MapX;
 				int y1 = o.Y + MapY;
+				if (x1 < 0) continue;
+				if (y1 < 0) continue; 
 				if (x1 > 800) continue;
 				if (y1 > 600) continue;
-				//vp.SetColor(Color.Chartreuse,30);
-				//vp.Circle(x1, y1, 16);
 				vp.SetColor(Color.White);
-				vp.DrawTexturePart(x1, y1, "main", 16, 16, o.TextureNum);
+				DrawObject(vp, x1, y1, o);
 			}
 			if (_targeted != null && _mode == Modes.MoveObject){
 				vp.SetColor(Color.BurlyWood);
-				vp.Circle(_targeted.X + MapX, _targeted.Y + MapY, 18);
-				//vp.Line(CursorPoint.X, CursorPoint.Y, _targeted.X + MapX, _targeted.Y + MapY);
+				vp.Circle(_targeted.X + MapX, _targeted.Y + MapY, 38);
 			}
 			if (_dragProcess){// для перемещения выводим отдельно цель в новых координатах, полупрозрачно
 				vp.SetColor(Color.BurlyWood,50);
 				int x1 = _targeted.X + MapX - (CursorPointFrom.X - CursorPoint.X);
 				int y1 = _targeted.Y + MapY - (CursorPointFrom.Y - CursorPoint.Y);
-				vp.DrawTexturePart(x1, y1, "main", 16, 16, _targeted.TextureNum);
-				vp.Circle(x1, y1, 23);
+				DrawObject(vp, x1, y1, _targeted);
+				vp.Circle(x1, y1, 43);
 			}
 			// выводим текущую текстуру
-			vp.DrawTexturePart(900, 320, "main", 16, 16, textureNum);
+			vp.DrawTexturePart(900, 320, "mainEdit", 32, 32, ObjectTypeAtlas.GetTextureNum(objectTypes));
+			base.DrawObject(vp);
+		}
+
+		private void DrawObject(VisualizationProvider vp, int x1, int y1, SimpleEditableObject o)
+		{
+			var num1 = ObjectTypeAtlas.GetTextureNum(o.ObjType);
+			if ((o.ObjType == ObjectTypes.Secret) || (o.ObjType == ObjectTypes.Flasher) || (o.ObjType == ObjectTypes.Moved))
+			{
+				var num2 = ObjectTypeAtlas.GetTextureNum(o.ObjTypeView);
+				vp.DrawTexturePart(x1, y1, "mainEdit", 32, 32, num2);
+			}
+			vp.DrawTexturePart(x1, y1, "mainEdit", 32, 32, num1);
 		}
 
 		protected override void MouseClick(int x, int y,Boolean dragStarted)
@@ -318,7 +328,8 @@ namespace SimpleMapEditor
 				AddObject(seo);
 				seo.X = x1;
 				seo.Y = y1;
-				seo.TextureNum = textureNum;
+				seo.ObjType = textureNum;
+				seo.ObjTypeView=ObjectTypes.Empty;
 			}
 		}
 

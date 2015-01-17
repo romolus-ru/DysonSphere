@@ -16,7 +16,7 @@ namespace SimpleMapEditor
 			Dictionary<int, SimpleEditableObject> data,ViewComponent parent) : base(controller, layerName, parent)
 		{
 			Data = data;
-			AddButton(210, 700, 200, 20, "ExitFullView", "exit", "Выйти из режима просмотра", Keys.Escape);
+			//AddButton(210, 100, 200, 20, "ExitFullView", "exit", "Выйти из режима просмотра", Keys.Escape);
 			// обработка события должна быть в более общем классе
 		}
 
@@ -57,6 +57,7 @@ namespace SimpleMapEditor
 				vp.Rectangle(x1, y1, 1, 1);
 			}
 			vp.Rectangle(CursorPoint.X-20,CursorPoint.Y-15,40,30);
+			base.DrawObject(vp);
 		}
 	}
 }

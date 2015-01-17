@@ -33,17 +33,23 @@ namespace Engine.Utils.Editor
 		/// <summary>
 		/// Кордината центра карты
 		/// </summary>
-		protected int MapX;
+		public int MapX;
 
 		/// <summary>
 		/// Кордината центра карты
 		/// </summary>
-		protected int MapY;
+		public int MapY;
 
 		/// <summary>
 		/// Смещение центра карты
 		/// </summary>
 		protected int MapDelta=16;
+
+		public void SynhronizeMapCoords(int mx, int my)
+		{
+			MapX = mx;
+			MapY = my;
+		}
 
 		public Layer(Controller controller, String layerName, ViewComponent parent) : base(controller,parent)
 		{
@@ -232,5 +238,12 @@ namespace Engine.Utils.Editor
 			if (e.IsKeyPressed(Keys.Up)) MapY += MapDelta;
 			if (e.IsKeyPressed(Keys.Down)) MapY -= MapDelta;
 		}
+
+		/// <summary>
+		/// Убираем фон
+		/// </summary>
+		/// <param name="visualizationProvider"></param>
+		protected override void DrawComponentBackground(VisualizationProvider visualizationProvider)
+		{}
 	}
 }

@@ -21,7 +21,7 @@ namespace SimpleMapEditor
 	{
 
 		public editor Editor;
-		public int textureNum;
+		public ObjectTypes ObjType;
 		public Boolean NewObjClick;// для создания нового объекта при клике на карте
 		public Boolean PaintObjClick;// для перекрашивания объекта при клике на карте
 		public Boolean GetInfoObjectClick;// для получения информации об объекте
@@ -105,7 +105,7 @@ namespace SimpleMapEditor
 				if (moveObjNumCurrent!=null){// элемент выделен
 					//var p=(SimpleEditableObject)Editor.GetObject(moveObjNumCurrent);// SetParam(moveObjNumCurrent, "TexNum", textureNum.ToString());
 					//if (p!=null){
-						moveObjNumCurrent.TextureNum = textureNum;
+						moveObjNumCurrent.ObjType = ObjType;
 					//}
 				}
 			}
@@ -195,8 +195,7 @@ namespace SimpleMapEditor
 				int y1 = p.Y + centerY;
 				if (x1 > 800) continue;
 				if (y1 > 600) continue;
-				int tn = p.TextureNum;
-				visualizationProvider.DrawTexturePart(x1, y1, "main", 16, 16, tn);
+				visualizationProvider.DrawTexturePart(x1, y1, "main", 16, 16, ObjectTypeAtlas.GetTextureNum(p.ObjType));
 				countPoints++;
 			}
 
@@ -235,15 +234,14 @@ namespace SimpleMapEditor
 				var y1 = p.Y + (moveCurrent.Y - moveStart.Y) + centerY;
 				visualizationProvider.SetColor(Color.OrangeRed);
 				visualizationProvider.Circle(x1, y1, 25);
-				int tn = p.TextureNum;
-				visualizationProvider.DrawTexturePart(x1, y1, "main", 16, 16, tn);
+				visualizationProvider.DrawTexturePart(x1, y1, "main", 16, 16, ObjectTypeAtlas.GetTextureNum(p.ObjType));
 			}
 
 			visualizationProvider.SetColor(Color.WhiteSmoke);
-			s = " номер " + textureNum;
+			s = " номер " + ObjType;
 			s += " Центр " + centerX + " " + centerY;
 			visualizationProvider.Print(70, visualizationProvider.CanvasHeight - 95, s);
-			visualizationProvider.DrawTexturePart(30,600,"main",16,16,textureNum);
+			visualizationProvider.DrawTexturePart(30, 600, "main", 16, 16, ObjectTypeAtlas.GetTextureNum(ObjType));
 		}
 
 		private SimpleEditableObject SearchNearest(IEnumerable items, int x, int y)
@@ -261,8 +259,7 @@ namespace SimpleMapEditor
 		/// <summary>
 		/// Обработка раскраски
 		/// </summary>
-		/// <param name="visualizationProvider"></param>
-		/// <param name="n"></param>
+		/// <param name="vp"></param>
 		private void DrawObjectInfo(VisualizationProvider vp, SimpleEditableObject viewS)
 		{
 			//TODO копирование свойств с выделенного объекта
@@ -285,8 +282,8 @@ namespace SimpleMapEditor
 				y = DrawObjectInfoOne(vp, y, "Num", view.Num.ToString());
 				y = DrawObjectInfoOne(vp, y, "X", view.X.ToString());
 				y = DrawObjectInfoOne(vp, y, "Y", view.Y.ToString());
-				vp.DrawTexturePart(860, y+16/2+3, "main", 16, 16, view.TextureNum);
-				y = DrawObjectInfoOne(vp, y, "Tex", view.TextureNum.ToString());
+				vp.DrawTexturePart(860, y+16/2+3, "main", 16, 16, ObjectTypeAtlas.GetTextureNum(view.ObjType));
+				y = DrawObjectInfoOne(vp, y, "Tex", view.ObjType.ToString());
 				
 			}
 		}

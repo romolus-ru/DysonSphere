@@ -49,10 +49,14 @@
     <Compile Include="DebugLabel1.cs" />
     <Compile Include="LayerSimpleEditableObject.cs" />
     <Compile Include="LayerSimpleEditableObjectMap.cs" />
+    <Compile Include="LayerSimpleEditableObjectMove.cs" />
+    <Compile Include="LayerSimpleEditableObjectTeleport.cs" />
+    <Compile Include="LayerSimpleEditableObjectView.cs" />
     <Compile Include="ObjectTypeAtlas.cs" />
     <Compile Include="ObjectTypes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShowMsg.cs" />
     <Compile Include="SimpleEditableObject.cs" />
     <Compile Include="SimpleMapEditor.cs" />
     <Compile Include="SimpleWindow.cs" />

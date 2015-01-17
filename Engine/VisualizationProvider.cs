@@ -291,7 +291,7 @@ namespace Engine
 		protected virtual void _DrawTexture(int x, int y, String textureName, float scale = 1) { }
 
 		/// <summary>
-		/// Вывести на экран часть текстуры
+		/// Вывести на экран часть разбитой на блоки текстуры
 		/// </summary>
 		/// <param name="x">Координата X</param>
 		/// <param name="y">Координата Y</param>
@@ -303,6 +303,22 @@ namespace Engine
 		{_DrawTexturePart(x + curOffsetX, y + curOffsetY, textureName, blockWidth, blockHeight, num);}
 
 		protected virtual void _DrawTexturePart(int x, int y, String textureName, int blockWidth, int blockHeight, int num) { }
+
+
+		/// <summary>
+		/// Вывести на экран произвольную часть текстуры, например в качестве прогрессбара
+		/// </summary>
+		/// <param name="x">Координата вывода на экран</param>
+		/// <param name="y"></param>
+		/// <param name="textureName">Имя текстуры</param>
+		/// <param name="xtex">Координата на текстуре откуда выводить</param>
+		/// <param name="ytex">Координата на текстуре откуда выводить</param>
+		/// <param name="width">Ширина выводимой области</param>
+		/// <param name="height">Высота выводимой области</param>
+		public void DrawTexturePart(int x, int y, String textureName, int xtex, int ytex, int width, int height)
+		{_DrawTexturePart(x,y,textureName, xtex, ytex, width, height);}
+
+		protected virtual void _DrawTexturePart(int x, int y, String textureName, int xtex, int ytex, int width, int height) { }
 
 		/// <summary>
 		/// Вывести на экран текстуру с маской (почти аналог LoadTextureAlpha)

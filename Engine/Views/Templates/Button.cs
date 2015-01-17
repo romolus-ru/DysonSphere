@@ -29,7 +29,7 @@ namespace Engine.Views.Templates
 		/// </summary>
 		protected Keys Key;
 
-		protected StateOne StateOneKeyboard=new StateOne();// для кнопки клавиатуры
+		protected StateOneTime StateOneKeyboard=StateOneTime.Init(15);// для кнопки клавиатуры
 		protected StateOne StateOneMouse = new StateOne();// для кнопки мыши
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace Engine.Views.Templates
 		public override void Keyboard(object sender, InputEventArgs e)
 		{
 			if (!CanDraw) return;
-			if (!CursorOver) return;
+			//if (!CursorOver) return;
 			// (если нажата кнопка мыши и мышка находится над кнопкой) или (если нажата кнопка на клавиатуре)
 			bool b = e.IsKeyPressed(Keys.LButton);
 			bool b2 = e.IsKeyPressed(Key);

@@ -380,17 +380,19 @@ namespace VisualizationOpenGL4
 			gl.LoadIdentity();
 			int z = 0;
 			TexStruct texInfo = _textures[textureName];
+			gl.PushAttrib(GL.ALPHA_TEST);		// Save the current GL_ALPHA_TEST
+			gl.Enable(GL.ALPHA_TEST);
 			gl.PushAttrib(GL.TEXTURE_2D);
 			// включаем режим текстурирования 
 			gl.Enable(GL.TEXTURE_2D);
 			gl.PushAttrib(GL.BLEND);
 			gl.Enable(GL.BLEND);
-			//Gl.glBlendFunc(texInfo.BlendParam, Gl.GL_ONE);// (SRC ALPHA или ONE)
-			gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);// (SRC ALPHA или ONE)
+			//gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);// непрозрачно
+			gl.BlendFunc(GL.SRC_ALPHA, GL.ONE);// прозрачно, как в DrawTexturePart
 			gl.BindTexture(GL.TEXTURE_2D, texInfo.Num);
 			int h = (int)(scale * texInfo.Height);// по идее это можно узнать с помощью GL_TEXTURE_WIDTH и HEIGHT
 			int w = (int)(scale * texInfo.Width);// но наврядли быстрее - счас без обращения к видеокарте
-
+			
 			// сохраняем состояние матрицы 
 			gl.PushMatrix();
 			gl.Translated(x, y, 0);
@@ -412,6 +414,7 @@ namespace VisualizationOpenGL4
 			// возвращаем всё в исходное состояние
 			gl.PopAttrib();//Gl.GL_BLEND
 			gl.PopAttrib();//Gl.GL_TEXTURE_2D
+			gl.PopAttrib();//Gl.GL_alpha_test
 			gl.BlendFunc(GL.ONE, GL.ONE);
 		}
 
@@ -463,10 +466,12 @@ namespace VisualizationOpenGL4
 
 			gl.Begin(GL.QUADS);
 			// указываем поочередно вершины и текстурные координаты
-			gl.TexCoord2f(x2, y1); gl.Vertex3d(blockWidth / 2, blockHeight / 2, z);
-			gl.TexCoord2f(x2, y2); gl.Vertex3d(blockWidth / 2, -blockHeight / 2, z);
-			gl.TexCoord2f(x1, y2); gl.Vertex3d(-blockWidth / 2, -blockHeight / 2, z);
-			gl.TexCoord2f(x1, y1); gl.Vertex3d(-blockWidth / 2, blockHeight / 2, z);
+			var blWd2 = blockWidth/2;
+			var blHd2 = blockHeight/2;
+			gl.TexCoord2f(x2, y1); gl.Vertex3d(blWd2, blHd2, z);
+			gl.TexCoord2f(x2, y2); gl.Vertex3d(blWd2, -blHd2, z);
+			gl.TexCoord2f(x1, y2); gl.Vertex3d(-blWd2, -blHd2, z);
+			gl.TexCoord2f(x1, y1); gl.Vertex3d(-blWd2, blHd2, z);
 
 			gl.End();
 
@@ -479,6 +484,65 @@ namespace VisualizationOpenGL4
 			gl.BlendFunc(GL.ONE, GL.ONE);
 		}
 
+		protected override void _DrawTexturePart(int x, int y, String textureName, int xtex, int ytex, int width, int height)
+		{
+			if (width <1) return;
+			if (height <1) return;
+
+			// проверяем, есть ли текстура. в крайнем случае можно выдать ошибку тут
+			if (!_textures.ContainsKey(textureName)) return;
+			gl.LoadIdentity();
+			int z = 0;
+			TexStruct texInfo = _textures[textureName];
+			int textureHeight = texInfo.Height;// по идее это можно узнать с помощью GL_TEXTURE_WIDTH и HEIGHT
+			int textureWidth = texInfo.Width;// но наврядли быстрее - счас без обращения к видеокарте
+			if (textureHeight < ytex + height) return;// выходим за рамки текстуры
+			if (textureWidth < xtex + width) return;// выходим за рамки текстуры
+			
+			gl.PushAttrib(GL.TEXTURE_2D);
+			// включаем режим текстурирования 
+			gl.Enable(GL.TEXTURE_2D);
+			gl.PushAttrib(GL.BLEND);
+			gl.Enable(GL.BLEND);
+			gl.BlendFunc(texInfo.BlendParam, GL.ONE);
+			gl.BindTexture(GL.TEXTURE_2D, texInfo.Num);
+
+
+			// сохраняем состояние матрицы 
+			gl.PushMatrix();
+			gl.Translated(x, y, 0);
+			gl.Rotated(_angle, 0.0f, 0.0f, 1.0f);
+
+			float x1a = xtex;
+			float x2a = xtex+width;
+			float y1a = ytex;
+			float y2a = ytex+height;
+
+			float x1 = x1a / textureWidth;
+			float x2 = x2a / textureWidth;
+			float y1 = y1a / textureHeight;
+			float y2 = y2a / textureHeight;
+
+			var blWd2 = width;
+			var blHd2 = height;
+
+			gl.Begin(GL.QUADS);
+			// указываем поочередно вершины и текстурные координаты
+			gl.TexCoord2f(x2, y1); gl.Vertex3d(width, 0, z);
+			gl.TexCoord2f(x2, y2); gl.Vertex3d(width, height, z);
+			gl.TexCoord2f(x1, y2); gl.Vertex3d(0, height, z);
+			gl.TexCoord2f(x1, y1); gl.Vertex3d(0, 0, z);
+
+			gl.End();
+
+			gl.Rotated(-_angle, 0.0f, 0.0f, 1.0f);// вращаем всё назад
+			// возвращаем матрицу 
+			gl.PopMatrix();
+			// возвращаем всё в исходное состояние
+			gl.PopAttrib();//Gl.GL_BLEND
+			gl.PopAttrib();//Gl.GL_TEXTURE_2D
+			gl.BlendFunc(GL.ONE, GL.ONE);
+		}
 
 		protected override void _DrawTextureMasked(int x, int y, string textureName, string textureMaskName)
 		{
@@ -901,10 +965,10 @@ namespace VisualizationOpenGL4
 			// создаем привязку к только что созданной текстуре 
 			gl.BindTexture(GL.TEXTURE_2D, texObject);
 			// устанавливаем режим фильтрации и повторения текстуры 
-			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.REPEAT);
-			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.REPEAT);
-			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP);
+			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP);
+			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.NEAREST);
+			gl.TexParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.NEAREST);
 			gl.TexEnvf(GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, GL.REPLACE);
 			// создаем RGB или RGBA текстуру 
 			switch (format)
