@@ -91,11 +91,6 @@ namespace Engine.Views.Templates
 			if (Hint != "" && CursorOver){
 				visualizationProvider.Print(X + 10, Y + Height + 5, Hint);
 			}
-
-			if (this.Name == "UU"){
-			//	throw new Exception("test");
-			}
-
 		}
 
 		/// <summary>

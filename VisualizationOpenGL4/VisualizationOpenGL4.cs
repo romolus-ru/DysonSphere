@@ -212,7 +212,13 @@ namespace VisualizationOpenGL4
 			double radial_factor = Math.Cos(theta);//calculate the radial factor 
 			double x = radius;//we start at angle = 0 
 			double y = 0;
-			gl.Disable(GL.TEXTURE_2D);
+
+			gl.Disable(GL.BLEND);
+			gl.Enable(GL.LINE_SMOOTH);
+			gl.Disable(GL.TEXTURE_2D); // Turn off textures
+			gl.Enable(GL.BLEND);
+			gl.BlendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+	
 			gl.Begin(GL.LINE_LOOP);
 			for (int ii = 0; ii < num_segments; ii++)
 			{

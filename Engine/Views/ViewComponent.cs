@@ -172,16 +172,6 @@ namespace Engine.Views
 
 		/// <summary>
 		/// Прорисовать фон компонентов, если нужно (можно сделать что бы это была простая панелька)
-	
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		/// </summary>
 		/// <param name="visualizationProvider"></param>
 		protected virtual void DrawComponentBackground(VisualizationProvider visualizationProvider)

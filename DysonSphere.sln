@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PathTester", "PathTester\Pa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMapEditor", "SimpleMapEditor\SimpleMapEditor.csproj", "{12DFCBF7-EB58-450A-9F1F-BADDDDB3086D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMTubes", "GMTubes\GMTubes.csproj", "{00721F19-CE9A-4791-92F4-557F56A63795}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{12DFCBF7-EB58-450A-9F1F-BADDDDB3086D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12DFCBF7-EB58-450A-9F1F-BADDDDB3086D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12DFCBF7-EB58-450A-9F1F-BADDDDB3086D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00721F19-CE9A-4791-92F4-557F56A63795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00721F19-CE9A-4791-92F4-557F56A63795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00721F19-CE9A-4791-92F4-557F56A63795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00721F19-CE9A-4791-92F4-557F56A63795}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
