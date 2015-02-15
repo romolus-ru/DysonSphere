@@ -3,7 +3,7 @@
 namespace Engine.Utils.Path
 {
 	/// <summary>
-	/// Точка с двумя координатами
+	/// Точка с двумя целочисленными координатами
 	/// </summary>
 	public class Point
 	{

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace Engine.Utils.Path
 {
@@ -39,6 +40,29 @@ namespace Engine.Utils.Path
 				var x = (int)bezier_spline(t, p1.X, p2.X, p3.X, p4.X);
 				var y = (int)bezier_spline(t, p1.Y, p2.Y, p3.Y, p4.Y);
 				_points.Add(new Point(x, y));
+				t += dt;
+			}
+			return _points;
+		}
+
+		/// <summary>
+		/// Генерация пути безье по четырём опорным точкам
+		/// </summary>
+		/// <param name="p1"></param>
+		/// <param name="p2"></param>
+		/// <param name="p3"></param>
+		/// <param name="p4"></param>
+		/// <param name="count"></param>
+		public List<PointF> GenerateBezierPathF(Point p1, Point p2, Point p3, Point p4, int count)
+		{
+			List<PointF> _points = new List<PointF>();
+			float t = 0;
+			float dt = (float)(1.0 / count);
+			for (int i = 0; i <= count; i++)
+			{
+				var x = bezier_spline(t, p1.X, p2.X, p3.X, p4.X);
+				var y = bezier_spline(t, p1.Y, p2.Y, p3.Y, p4.Y);
+				_points.Add(new PointF(x, y));
 				t += dt;
 			}
 			return _points;

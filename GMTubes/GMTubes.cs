@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Engine;
 using Engine.Controllers;
 using Engine.Controllers.Events;
+using Engine.Utils.GraphView;
 using Engine.Utils.Settings;
 using Engine.Views;
 using Engine.Utils.Editor;
@@ -28,6 +29,8 @@ namespace GMTubes
 		private ViewModalInputName _input;
 		private ViewModalCongratulations _congratulations;
 		private Background background;
+		private ViewGraph _graph;
+
 
 		public static UserInfo UserInfo=new UserInfo();
 
@@ -54,7 +57,7 @@ namespace GMTubes
 
 			// сначала создаётся и запускается меню. из него выбираются параметры запуска
 			// при нажатии "старт" в модуле прячется меню и запускается игра
-			// если нажать esc то откроется меню - там можно будет выбрать прохолжить, начать снова, параметры или выход
+			// если нажать esc то откроется меню - там можно будет выбрать продолжить, начать снова, параметры или выход
 
 			Controller.AddEventHandler("GMTubesStart", GMTubesStart);
 			Controller.AddEventHandler("GMTubesPause", GMTubesPause);
@@ -66,10 +69,12 @@ namespace GMTubes
 			Controller.AddEventHandler("GMTubesVictoryOk", GMTubesVictoryOk);
 			Controller.AddEventHandler("GMTubesVictoryCloseModal", GMTubesVictoryCloseModal);
 			Controller.AddEventHandler("GMTubesSet1", GMTubesSet1);
-			Controller.AddEventHandler("GMTubesSet2", GMTubesSet2);
-			Controller.AddEventHandler("GMTubesExit",GMTubesExit);
+			Controller.AddEventHandler("GMTubesExit", GMTubesExit);
+			Controller.AddEventHandler("GMTubesGraph", GMTubesGraph);
+			Controller.AddEventHandler("GMTubesGraphOut", GMTubesGraphOut);
+			Controller.AddEventHandler("GMTubesGraphCloseModal", GMTubesGraphCloseModal);
 
-			Controller.AddToStore(this, StoredEventEventArgs.StoredMilliseconds(100, "GMTubesStart", this, EventArgs.Empty));
+			//Controller.AddToStore(this, StoredEventEventArgs.StoredMilliseconds(100, "GMTubesStart", this, EventArgs.Empty));
 		}
 
 		private void InitUserInfo()
@@ -110,19 +115,30 @@ namespace GMTubes
 
 		private void GMTubesSet1(object sender, EventArgs e)
 		{
-			
+			var s = sender as ViewButtonCoords;
+			StartNew(s.Selected);
 		}
-
-		private void GMTubesSet2(object sender, EventArgs e)
-		{
-			
-		}
-
 
 		private void GMTubesStart(object sender, EventArgs e)
 		{
+			//StartNew(UserInfo.CurrentLevel);
 			_menu.Hide();
 			_f = new Field(UserInfo.CurrentLevel);
+			_f.CalculateLevelCost();
+			_vf.SetF(_f);
+			_vf.Alpha = 0;
+			_vf.Show();
+			_f.Time.Restart();
+		}
+
+		/// <summary>
+		/// Запустить уровень со сложностью level
+		/// </summary>
+		/// <param name="level"></param>
+		private void StartNew(int level)
+		{
+			_menu.Hide();
+			_f = new Field(level);
 			_f.CalculateLevelCost();
 			_vf.SetF(_f);
 			_vf.Alpha = 0;
@@ -201,5 +217,52 @@ namespace GMTubes
 			}
 			GMTubesStart(sender, e);
 		}
+
+		private void GMTubesGraph(object sender, EventArgs e)
+		{
+			_graph=new ViewGraph(Controller, null, "GMTubesGraphOut","GMTubesGraphCloseModal");
+			//_graph.AddGraphLine("Высота", Color.GreenYellow);
+			var maxh = new List<PointF>();
+			var maxw = new List<PointF>();
+			var tGold = new List<PointF>();
+			var tSilver = new List<PointF>();
+			var max3x = new List<PointF>();
+			var max4x = new List<PointF>();
+			var fsize = new List<PointF>();
+			var fsize2 = new List<PointF>();
+			for (int i = 1; i < 11; i++)
+			{
+				_f.InitCreationParams(i);
+				maxh.Add(new PointF(_f.MaxH, i));
+				maxw.Add(new PointF(_f.MaxW, i));
+				tGold.Add(new PointF(_f.TimeGold, i));
+				tSilver.Add(new PointF(_f.TimeSilver, i));
+				max3x.Add(new PointF(_f.Max3x, i));
+				max4x.Add(new PointF(_f.Max4x, i));
+				fsize.Add(new PointF(i, _f.MaxH * _f.MaxW/100));
+				fsize2.Add(new PointF(_f.MaxH * _f.MaxW/100,i));
+				//_graph.AddPoint("Высота",new PointF(i,_f.MaxH));
+			}
+			_graph.AddGraphLine("Высота", Color.MidnightBlue, maxh);
+			_graph.AddGraphLine("Ширина", Color.MediumVioletRed, maxw);
+			_graph.AddGraphLine("Золото", Color.DarkGoldenrod, tGold);
+			_graph.AddGraphLine("Серебро", Color.Silver, tSilver);
+			_graph.AddGraphLine("3х элементы ", Color.SeaGreen, max3x);
+			_graph.AddGraphLine("4х элементы", Color.SteelBlue, max4x);
+			_graph.AddGraphLine("Размер поля", Color.SeaGreen, fsize);
+			_graph.AddGraphLine("Размер поля2", Color.SeaGreen, fsize2);
+			_sys.AddComponent(_graph);
+			_sys.BringToFront(_graph);
+		}
+		
+		private void GMTubesGraphOut(object sender, EventArgs e) { }// тут ничего не нужно делать
+
+		private void GMTubesGraphCloseModal(object sender, EventArgs e)
+		{
+			_sys.Remove(_graph);
+			_graph.Dispose();
+			_graph = null;
+		}
+
 	}
 }

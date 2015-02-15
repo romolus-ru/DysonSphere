@@ -94,7 +94,7 @@ namespace Engine.Views.Templates
 		}
 
 		/// <summary>
-		/// Инициализируем кнопку. закрытый метод, может быть удастся от него избавиться и опрерделиться что лучше 
+		/// Инициализируем кнопку. закрытый метод, может быть удастся от него избавиться и определиться что лучше 
 		/// </summary>
 		/// <param name="controller"></param>
 		/// <param name="x"></param>
@@ -142,5 +142,50 @@ namespace Engine.Views.Templates
 		{
 			Caption = newCaption;
 		}
+
+		/// <summary>
+		/// Инициализируем кнопку. закрытый метод, может быть удастся от него избавиться и определиться что лучше 
+		/// </summary>
+		/// <param name="btn"></param>
+		/// <param name="controller"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="eventName"></param>
+		/// <param name="caption"></param>
+		/// <param name="hint"></param>
+		/// <param name="key"></param>
+		private static void InitButton(Button btn, Controller controller, int x, int y, int width, int height,
+			string eventName, String caption, String hint, Keys key)
+		{
+			btn.Show();
+			var dx = 0;//rnd.Next(0, 20);
+			var dy = 0;//rnd.Next(0, 20);
+			btn.SetCoordinates(x + dx, y + dy, 0);
+			btn.SetSize(width, height);
+			btn.Init(eventName, caption, hint, key);
+		}
+
+		/// <summary>
+		/// Инициализируем кнопку, с учётом названия
+		/// </summary>
+		/// <param name="controller"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="eventName"></param>
+		/// <param name="caption"></param>
+		/// <param name="hint"></param>
+		/// <param name="key"></param>
+		/// <param name="buttonName"></param>
+		public static Button InitButton(Button btn, Controller controller, int x, int y, int width, int height, string eventName, String caption, String hint, System.Windows.Forms.Keys key, String buttonName)
+		{
+			InitButton(btn, controller, x, y, width, height, eventName, caption, hint, key);
+			btn.Name = buttonName;// по умолчанию берётся из caption, может быть приживётся
+			return btn;
+		}
+
 	}
 }

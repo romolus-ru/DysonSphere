@@ -102,6 +102,8 @@
     <Compile Include="Utils\ExtensionMethods\extensions.cs" />
     <Compile Include="Utils\ExtensionMethods\MayBe.cs" />
     <Compile Include="Utils\FileArchieve.cs" />
+    <Compile Include="Utils\GraphView\GraphicLine.cs" />
+    <Compile Include="Utils\GraphView\ViewGraph.cs" />
     <Compile Include="Utils\Path\Path.cs" />
     <Compile Include="Utils\Path\PathGenerator.cs" />
     <Compile Include="Utils\Path\PathGeneratorBezier.cs" />

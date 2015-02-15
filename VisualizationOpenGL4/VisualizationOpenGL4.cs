@@ -739,6 +739,7 @@ namespace VisualizationOpenGL4
 			gl.PushMatrix();						// Save the current modelview matrix
 			gl.LoadIdentity();
 
+			// TODO к тексту можно добавить поворот gl.Rotated(_angle, 0.0f, 0.0f, 1.0f);
 			//Gl.glTranslated(x, y, 0);
 			gl.WindowPos2iARB(x, _formOpenGl.Height - y - 16);
 			gl.PushAttrib(GL.LIST_BIT);		// Save's the current base list

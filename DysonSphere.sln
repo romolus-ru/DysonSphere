@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleMapEditor", "SimpleMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMTubes", "GMTubes\GMTubes.csproj", "{00721F19-CE9A-4791-92F4-557F56A63795}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GMBuildCraft", "GMBuildCraft\GMBuildCraft.csproj", "{86EAFF9B-D216-4423-84AF-6D1433521F1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{00721F19-CE9A-4791-92F4-557F56A63795}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00721F19-CE9A-4791-92F4-557F56A63795}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00721F19-CE9A-4791-92F4-557F56A63795}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86EAFF9B-D216-4423-84AF-6D1433521F1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86EAFF9B-D216-4423-84AF-6D1433521F1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86EAFF9B-D216-4423-84AF-6D1433521F1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86EAFF9B-D216-4423-84AF-6D1433521F1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

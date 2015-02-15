@@ -46,6 +46,7 @@
     <Compile Include="GMTubes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInfo.cs" />
+    <Compile Include="ViewButtonCoords.cs" />
     <Compile Include="ViewField.cs" />
     <Compile Include="ViewMenu.cs" />
     <Compile Include="ViewModalCongratulations.cs" />

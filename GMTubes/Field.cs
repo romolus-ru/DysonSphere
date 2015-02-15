@@ -23,6 +23,9 @@ namespace GMTubes
 		public const int MaxWidth = 30;
 		public const int MaxHeight = 20;
 
+		public int TimeGold { get; private set; }
+		public int TimeSilver { get; private set; }
+
 		public int MaxW;
 		public int MaxH;
 		public int Max4x;
@@ -75,10 +78,12 @@ namespace GMTubes
 			for (int i = 0; i < count4;i++){Create4xFieldPoint(f); }
 			// проходим по всем объектам и если это 4х связная точка и ещё не статичная - уменьшаем ей количество связей
 			ReduceCount4x(f);
+			VerifyCountLinks(f);
 			// выбираем 3х связные точки и сохраняем их состояние
 			for (int i = 0; i < count3; i++) { Create3xFieldPoint(f); }
 			// проходим по всем объектам и уменьшаем количество связей если возможно до 2х
 			ReduceCount3x(f);
+			VerifyCountLinks(f);
 			// избавляемся от разрывов, что бы можно было перейти от всех объектов ко всем остальным
 			ReduceGap(f, maxWidth, maxHeight, holes);
 			VerifyCountLinks(f);
@@ -114,7 +119,7 @@ namespace GMTubes
 			int c=0;
 			var r = false;// ненашли
 			do{
-				c++;if (c > 100) break;
+				c++;if (c > 500) break;
 
 				var x = _rnd.Next(maxWidth);
 				var y = _rnd.Next(maxHeight);
@@ -128,42 +133,49 @@ namespace GMTubes
 				FieldPoint fp2 = null;
 				if (!l&&fp.LinkDown == null && fp.j+1<=maxHeight && !f[fp.i, fp.j + 1]){// есть неотмеченная область - создаём связь
 					fp2 = fieldPoints[fp.i, fp.j + 1];
-					if (fp2!=null&& fp2.countLinksAvailable != 4){// если можно создать связь - создаём
+					if (fp2 != null && fp2.countLinksAvailable != 4 && fp2.LinkUp == null){// если можно создать связь - создаём
 						fp.LinkDown = fp2;
 						fp.countLinksAvailable++;
 						fp2.LinkUp = fp;
 						fp2.countLinksAvailable++;
 						l = true;
+						VerifyCountLinks(fieldPoints);
 					}
 				}
 				if (!l&&fp.LinkUp == null &&(fp.j - 1>=0)&& !f[fp.i, fp.j - 1]){// есть неотмеченная область - создаём связь
 					fp2 = fieldPoints[fp.i, fp.j - 1];
-					if (fp2!=null&& fp2.countLinksAvailable != 4){// если можно создать связь - создаём
+					if (fp2 != null && fp2.countLinksAvailable != 4 && fp2.LinkDown == null){// если можно создать связь - создаём
+						if (fp2.LinkDown != null) throw new Exception("связь уже есть");
 						fp.LinkUp = fp2;
 						fp.countLinksAvailable++;
 						fp2.LinkDown = fp;
 						fp2.countLinksAvailable++;
 						l = true;
+						VerifyCountLinks(fieldPoints);
 					}
 				}
 				if (!l&&fp.LinkLeft == null && (fp.i+1<=maxWidth) && !f[fp.i+1, fp.j]){// есть неотмеченная область - создаём связь
 					fp2 = fieldPoints[fp.i+1, fp.j];
-					if (fp2!=null&&fp2.countLinksAvailable != 4){// если можно создать связь - создаём
+					if (fp2 != null && fp2.countLinksAvailable != 4 && fp2.LinkRight == null){// если можно создать связь - создаём
+						if (fp2.LinkRight != null) throw new Exception("связь уже есть");
 						fp.LinkLeft = fp2;
 						fp.countLinksAvailable++;
 						fp2.LinkRight = fp;
 						fp2.countLinksAvailable++;
 						l = true;
+						VerifyCountLinks(fieldPoints);
 					}
 				}
 				if (!l&&fp.LinkRight == null &&(fp.i-1>=0)&& !f[fp.i-1, fp.j]){// есть неотмеченная область - создаём связь
 					fp2 = fieldPoints[fp.i-1, fp.j];
-					if (fp2!=null&&fp2.countLinksAvailable != 4){// если можно создать связь - создаём
+					if (fp2 != null && fp2.countLinksAvailable != 4 && fp2.LinkLeft == null){// если можно создать связь - создаём
+						if (fp2.LinkLeft!=null)throw new Exception("связь уже есть");
 						fp.LinkRight = fp2;
 						fp.countLinksAvailable++;
 						fp2.LinkLeft = fp;
 						fp2.countLinksAvailable++;
 						l = true;
+						VerifyCountLinks(fieldPoints);
 					}
 				}
 
@@ -569,12 +581,22 @@ namespace GMTubes
 		/// </summary>
 		public void InitCreationParams(int level)
 		{
+			int maxLevel = 10;// максимальное количество уровней
 			MaxW = 7;
 			MaxH = 5;
 			Max4x = 3;
 			Max3x = 5;
 			MaxHl = 0;
-			
+
+			MaxW += level * (MaxWidth - MaxW-1) / maxLevel;
+			MaxH += level * (MaxHeight - MaxH-1) / maxLevel;
+
+			Max4x += level * (15 - Max4x) / maxLevel;
+			Max3x += level * (45 - Max3x) / maxLevel;
+
+			TimeGold = 30*level;// проверить
+			TimeSilver = 90*level;
+
 		}
 
 		/// <summary>
@@ -584,8 +606,8 @@ namespace GMTubes
 		public int LevelTimeInterval()
 		{
 			var ret = 0;
-			if (Time.Elapsed.TotalSeconds < 90) ret = 1;
-			if (Time.Elapsed.TotalSeconds < 30) ret = 2;
+			if (Time.Elapsed.TotalSeconds < TimeSilver) ret = 1;
+			if (Time.Elapsed.TotalSeconds < TimeGold) ret = 2;
 			return ret;
 		}
 
@@ -600,7 +622,8 @@ namespace GMTubes
 					if (f1.LinkLeft != null) cl++;
 					if (f1.LinkUp != null) cl++;
 					if (f1.LinkRight != null) cl++;
-					if (cl!=f1.countLinksAvailable) throw new Exception("количество связей не совпадает");
+					if (cl != f1.countLinksAvailable) //f1.Broken = true;
+					throw new Exception("количество связей не совпадает");
 				}
 			}
 

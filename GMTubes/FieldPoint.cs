@@ -16,6 +16,8 @@ namespace GMTubes
 		/// </summary>
 		public Boolean IsStatic { get; set; }
 
+		public Boolean Broken = false;
+
 		private float _addToRotate = 0;
 
 		/// <summary>

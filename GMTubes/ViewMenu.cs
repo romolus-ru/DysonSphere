@@ -33,8 +33,10 @@ namespace GMTubes
 			AddButton(310, 300, 200, 40, "GMTubesStart", "Старт", "Старт", Keys.N);
 			AddButton(310, 350, 200, 40, "GMTubesNewPlayer", "Сбросить успехи", "Сбросить успехи", Keys.U);
 			AddButton(310, 400, 200, 40, "GMTubesExit", "Выход", "Выход", Keys.Space);
-			AddButton(310, 450, 200, 40, "GMTubesSet1", "Сложность Режим 1", "Выставить сложность режим 1", Keys.D1);
-			AddButton(310, 500, 200, 40, "GMTubesSet2", "Сложность Режим 2", "Выставить сложность режим 2", Keys.D2);
+			AddButton(100, 010, 200, 40, "GMTubesGraph", "График", "График", Keys.G);
+			var b1 = AddButton2(310, 450, 200, 40, "GMTubesSet1", "Выберите сложность", "Выберите сложность запускаемого уровня", Keys.None);
+			b1.b1 = 1;
+			b1.b2 = 10;
 			btnContinue.Hide();
 		}
 
@@ -52,6 +54,16 @@ namespace GMTubes
 			AddComponent(btn);
 			return btn;
 		}
+
+		public ViewButtonCoords AddButton2(int x, int y, int width, int height, string eventName,
+			string caption, string hint, Keys key)
+		{
+			var btn = new ViewButtonCoords(Controller, null);
+			Button.InitButton(btn, Controller, x, y, width, height, eventName, caption, hint, key, caption);
+			AddComponent(btn);
+			return btn;
+		}
+
 		protected override void DrawObject(VisualizationProvider vp)
 		{
 			base.DrawObject(vp);
