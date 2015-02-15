@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Engine.Utils.ExtensionMethods;
+using System.Diagnostics;
 
 namespace GMTubes
 {
@@ -14,13 +8,28 @@ namespace GMTubes
 	/// </summary>
 	class Field
 	{
+		#region Переменные
+
+		/// <summary>
+		/// Результат проверки
+		/// </summary>
+		private enum VerRes
+		{
+			Ok,
+			NoBlock,
+			NoLink,
+		}
+
 		public const int MaxWidth = 30;
 		public const int MaxHeight = 20;
 
 		public int MaxW;
 		public int MaxH;
+		public int Max4x;
+		public int Max3x;
+		public int MaxHl;
 
-		public FieldPoint[,] Data=null;
+		public FieldPoint[,] Data = null;
 		/// <summary>
 		/// Выводим ошибку сюда при создании поля
 		/// </summary>
@@ -28,10 +37,19 @@ namespace GMTubes
 
 		private Random _rnd = new Random();
 
-		public Field()
+		public int LevelCost = 0;
+		public Stopwatch Time;
+
+		#endregion
+
+		public Field(int level)
 		{
-			Data = GenerateField(10, 7, 5, 10, 2);
+			InitCreationParams(level);
+			Data = GenerateField(MaxW,MaxH,Max4x,Max3x,MaxHl);//5, 5, 2, 5, 2);
+			Time=new Stopwatch();
 		}
+
+		#region Генерация поля
 
 		/// <summary>
 		/// Генерация поля
@@ -63,6 +81,7 @@ namespace GMTubes
 			ReduceCount3x(f);
 			// избавляемся от разрывов, что бы можно было перейти от всех объектов ко всем остальным
 			ReduceGap(f, maxWidth, maxHeight, holes);
+			VerifyCountLinks(f);
 			InitInfo(f);
 			return f;
 		}
@@ -71,7 +90,10 @@ namespace GMTubes
 		{
 			var h = 0;// сейчас дырки не делаем, поэтому и не надо их учитывать
 			int count;
+			int c = 0;
 			do{// рекурсивная функция, отмечает все точки с которыми связана переданная
+				c++;
+				if (c > 1000) break;
 				var f = new Boolean[MaxWidth, MaxHeight];
 				ReduceGap1(f, fieldPoints, fieldPoints[0, 0]);
 				count = 0;
@@ -155,8 +177,8 @@ namespace GMTubes
 		{
 			if (f[fp.i, fp.j]) return;// точка уже отмечена - выходим
 			f[fp.i, fp.j] = true;// отммечаем точку. раз добрались до неё значит путь есть
-			if (fp.LinkLeft != null) { ReduceGap1(f, fieldPoints, fieldPoints[fp.i + 1, fp.j]); }
-			if (fp.LinkRight != null) { ReduceGap1(f, fieldPoints, fieldPoints[fp.i - 1, fp.j]); }
+			if (fp.LinkLeft != null) { ReduceGap1(f, fieldPoints, fieldPoints[fp.i - 1, fp.j]); }
+			if (fp.LinkRight != null) { ReduceGap1(f, fieldPoints, fieldPoints[fp.i + 1, fp.j]); }
 			if (fp.LinkUp != null){ ReduceGap1(f, fieldPoints, fieldPoints[fp.i, fp.j - 1]); }
 			if (fp.LinkDown != null){ ReduceGap1(f, fieldPoints, fieldPoints[fp.i, fp.j + 1]); }
 		}
@@ -168,6 +190,7 @@ namespace GMTubes
 					var f = fieldPoints[i, j];
 					if (f==null)continue;
 					f.InitInfo();
+					f.Rotate();// принудительное обязательное вращение
 					for (int k = 0; k < _rnd.Next(4); k++){
 						f.Rotate();
 					}
@@ -190,9 +213,10 @@ namespace GMTubes
 					if (f1.LinkLeft != null && f1.LinkLeft.IsStatic == false) nonStaticLink++;
 					if (f1.LinkRight != null && f1.LinkRight.IsStatic == false) nonStaticLink++;
 					if (nonStaticLink < 1) continue;// нету нестатичных связей - ничего не меняем
-					while (f1.countLinksAvailable == cla1)
-					{
-						ClearLink(f1, _rnd.Next(4));
+					int c = 0;
+					while (f1.countLinksAvailable == cla1){
+						c++; if (c > 40) break;// если 40 раз не смогли удалить связь - пропускаем объект
+						if (ClearLink(f1, _rnd.Next(4))) break;
 					}
 				}
 			}
@@ -200,17 +224,17 @@ namespace GMTubes
 
 		private void ReduceCount4x(FieldPoint[,] f)
 		{
-			for (int i = 0; i < MaxWidth; i++)
-			{
-				for (int j = 0; j < MaxHeight; j++)
-				{
+			for (int i = 0; i < MaxWidth; i++){
+				for (int j = 0; j < MaxHeight; j++){
 					var f1 = f[i, j];
 					if (f1 == null) continue;
 					if (f1.IsStatic) continue;
 					var cla1 = f1.countLinksAvailable;
 					if (cla1 < 4) continue;// не статичная, связей 4 - уменьшаем количество связей
+					int c = 0;
 					while (f1.countLinksAvailable==cla1){
-						ClearLink(f1, _rnd.Next(4));
+						c++;if (c > 40) break;// если 40 раз не смогли удалить связь - пропускаем объект
+						if(ClearLink(f1, _rnd.Next(4)))break;
 					}
 				}
 			}
@@ -219,11 +243,13 @@ namespace GMTubes
 		private bool ClearLink(FieldPoint f1, int numLink)
 		{
 			var fp = f1;
+			if (fp.IsStatic) return false;
 			if (fp.countLinksAvailable < 3) return false;
 			if (numLink == 0){
 				if (fp.LinkDown == null) return false;
 				if (fp.LinkDown.countLinksAvailable<3) return false;
 				if (fp.LinkDown.LinkUp == null) return false;
+				if (fp.LinkDown.IsStatic) return false;
 				fp.LinkDown.LinkUpNull();
 				fp.LinkDownNull();
 				return true;
@@ -232,6 +258,7 @@ namespace GMTubes
 				if (fp.LinkLeft == null) return false;
 				if (fp.LinkLeft.countLinksAvailable<3) return false;
 				if (fp.LinkLeft.LinkRight == null) return false;
+				if (fp.LinkLeft.IsStatic) return false;
 				fp.LinkLeft.LinkRightNull();
 				fp.LinkLeftNull();
 				return true;
@@ -240,6 +267,7 @@ namespace GMTubes
 				if (fp.LinkRight == null) return false;
 				if (fp.LinkRight.countLinksAvailable<3) return false;
 				if (fp.LinkRight.LinkLeft == null) return false;
+				if (fp.LinkRight.IsStatic) return false;
 				fp.LinkRight.LinkLeftNull();
 				fp.LinkRightNull();
 				return true;
@@ -248,6 +276,7 @@ namespace GMTubes
 				if (fp.LinkUp == null) return false;
 				if (fp.LinkUp.countLinksAvailable<3) return false;
 				if (fp.LinkUp.LinkDown == null) return false;
+				if (fp.LinkUp.IsStatic) return false;
 				fp.LinkUp.LinkDownNull();
 				fp.LinkUpNull();
 				return true;
@@ -341,7 +370,7 @@ namespace GMTubes
 			}
 			for (int i = 1; i < maxWidth; i++){
 				for (int j = 0; j < maxHeight; j++){
-					f[i - 1, j].LinkLeft = f[i, j];
+					f[i - 1, j].LinkRight = f[i, j];
 				}
 			}
 			for (int i = 0; i < maxWidth; i++){
@@ -351,7 +380,7 @@ namespace GMTubes
 			}
 			for (int i = 0; i < maxWidth-1; i++){
 				for (int j = 0; j < maxHeight; j++){
-					f[i +1, j].LinkRight = f[i, j];
+					f[i +1, j].LinkLeft = f[i, j];
 				}
 			}
 			for (int i = 0; i < maxWidth; i++){
@@ -413,5 +442,169 @@ namespace GMTubes
 				r = true;
 			} while (!r);
 		}
+
+		#endregion
+
+		#region Проверка
+
+		public String VerifyCurrent()
+		{
+			var ret = "";
+			// формируем новый массив (без связей)
+			// заполняем массив связями блока, повернутыми по текущему углу
+			// проверяем, что связи блока взаимны
+			var f = VerifyCurrentGetField();
+			// теперь надо проверить, сходится ли решение
+			for (int i = 0; i < MaxWidth; i++){
+				for (int j = 0; j < MaxHeight; j++){
+					if (ret != "") continue;// если ошибка есть то пропускаем всё
+					var fn = f[i, j];
+					if (fn == null) continue;
+					if (VerRes.NoLink==VerifyCurrentLink1(f, i, j, 0)) ret += "(" + i + "," + j + ") некорректно (0 Down)";
+					if (VerRes.NoLink==VerifyCurrentLink1(f, i, j, 1)) ret += "(" + i + "," + j + ") некорректно (1 Left)";
+					if (VerRes.NoLink==VerifyCurrentLink1(f, i, j, 2)) ret += "(" + i + "," + j + ") некорректно (2 Right)";
+					if (VerRes.NoLink==VerifyCurrentLink1(f, i, j, 3)) ret += "(" + i + "," + j + ") некорректно (3 Up)";
+				}
+			}
+
+			return ret;
+		}
+
+		public FieldPoint[,] VerifyCurrentGetField()
+		{
+			var f = new FieldPoint[MaxWidth, MaxHeight];
+			var fLink = new FieldPoint(); // фиктивная точка, что бы было видно связи
+
+			for (int i = 0; i < MaxWidth; i++){
+				for (int j = 0; j < MaxHeight; j++){
+					var f1 = Data[i, j];
+					if (f1 == null) continue;
+					f[i, j] = new FieldPoint();
+					f[i, j].angle = f1.angle;
+					f[i, j].texnum = f1.texnum;
+					f[i, j].currentAngle = f1.currentAngle;
+					f[i, j].i = f1.i;
+					f[i, j].j = f1.j;
+				}
+			}
+
+			for (int i = 0; i < MaxWidth; i++){
+				for (int j = 0; j < MaxHeight; j++){
+					var f1 = Data[i, j];
+					if (f1 == null) continue;
+					var fn = f[i, j];
+					//if (f1.LinkDown != null) fn.LinkDown = fLink;
+					//if (f1.LinkLeft != null) fn.LinkLeft = fLink;
+					//if (f1.LinkRight != null) fn.LinkRight = fLink;
+					//if (f1.LinkUp != null) fn.LinkUp=fLink;
+
+					if (f1.LinkDown != null) VerifyCurrentSetLink(fn, fLink, 0);
+					if (f1.LinkLeft != null) VerifyCurrentSetLink(fn, fLink, 1);
+					if (f1.LinkUp != null) VerifyCurrentSetLink(fn, fLink, 2);
+					if (f1.LinkRight != null) VerifyCurrentSetLink(fn, fLink, 3);
+				}
+			}
+			return f;
+		}
+
+		/// <summary>
+		/// Устанавливаем связь
+		/// </summary>
+		/// <param name="fSet">Объект которому устанавливаем связь</param>
+		/// <param name="fLink">Объект на который устанавливаем связь</param>
+		/// <param name="start">Начальный угол поворота, направление связи, которое надо повернуть</param>
+		private void VerifyCurrentSetLink(FieldPoint fSet, FieldPoint fLink, int start)
+		{
+			var ca = fSet.currentAngle-fSet.angle; if (ca > 3) ca -= 4;// если повернуто на больше чем 1 оборот - вертаем обратно
+			ca += start; if (ca > 3) ca -= 4;// если повернуто на больше чем 1 оборот - вертаем обратно
+			if (ca < 0) ca += 4;
+			if (ca == 0) { fSet.LinkDown = fLink; return; }
+			if (ca == 1) { fSet.LinkLeft = fLink; return; }
+			if (ca == 2) { fSet.LinkUp = fLink; return; }
+			if (ca == 3) { fSet.LinkRight = fLink; return; }
+			throw new Exception("Угол поворота неправильный");
+		}
+		
+		private VerRes VerifyCurrentLink1(FieldPoint[,] f, int i, int j, int angle)
+		{
+			var ret = VerRes.NoLink;
+			var fn = f[i, j];
+			var i2 = i;
+			var j2 = j;
+			if (angle == 0) j2++;
+			if (angle == 1) i2--;
+			if (angle == 2) j2--;
+			if (angle == 3) i2++;
+			var fn2 = VerifyCurrentLink2Get(f, i2, j2);
+			if (fn2 == null) return VerRes.NoBlock;
+			// теперь у нас есть 2 примыкающих друг к другу блока. определяем, соприкасаются ли они
+			if (angle == 0 && fn.LinkDown == fn2.LinkUp) ret = VerRes.Ok;
+			if (angle == 1 && fn.LinkLeft == fn2.LinkRight) ret = VerRes.Ok;
+			if (angle == 2 && fn.LinkUp == fn2.LinkDown) ret = VerRes.Ok;
+			if (angle == 3 && fn.LinkRight == fn2.LinkLeft) ret = VerRes.Ok;
+			return ret;
+		}
+
+		private FieldPoint VerifyCurrentLink2Get(FieldPoint[,] f, int i2, int j2)
+		{
+			if (i2 < 0) return null;
+			if (j2 < 0) return null;
+			if (i2 >=MaxW) return null;
+			if (j2 >= MaxH) return null;// выходит за границы - значит точно блок должен быть пустым
+			return f[i2, j2];
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Рассчитываем цену прохождения уровня
+		/// </summary>
+		public void CalculateLevelCost()
+		{
+			LevelCost = MaxW*MaxH;
+		}
+
+		/// <summary>
+		/// Инициализируем параметры создания поля
+		/// </summary>
+		public void InitCreationParams(int level)
+		{
+			MaxW = 7;
+			MaxH = 5;
+			Max4x = 3;
+			Max3x = 5;
+			MaxHl = 0;
+			
+		}
+
+		/// <summary>
+		/// 0 бронза, 1 серебро, 2 золото
+		/// </summary>
+		/// <returns></returns>
+		public int LevelTimeInterval()
+		{
+			var ret = 0;
+			if (Time.Elapsed.TotalSeconds < 90) ret = 1;
+			if (Time.Elapsed.TotalSeconds < 30) ret = 2;
+			return ret;
+		}
+
+		private void VerifyCountLinks(FieldPoint[,] f)
+		{
+			for (int i = 0; i < MaxWidth; i++){
+				for (int j = 0; j < MaxHeight; j++){
+					var f1 = f[i, j];
+					if (f1 == null) continue;
+					var cl = 0;
+					if (f1.LinkDown != null) cl++;
+					if (f1.LinkLeft != null) cl++;
+					if (f1.LinkUp != null) cl++;
+					if (f1.LinkRight != null) cl++;
+					if (cl!=f1.countLinksAvailable) throw new Exception("количество связей не совпадает");
+				}
+			}
+
+		}
+
 	}
 }

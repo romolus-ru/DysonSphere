@@ -16,6 +16,8 @@ namespace GMTubes
 		/// </summary>
 		public Boolean IsStatic { get; set; }
 
+		private float _addToRotate = 0;
+
 		/// <summary>
 		/// Ссылки на соседние ячейки
 		/// </summary>
@@ -44,6 +46,7 @@ namespace GMTubes
 
 		public Boolean LinkUpNull()
 		{
+			if (IsStatic) return false;
 			if (LinkUp == null) return false;
 			countLinksAvailable--;
 			LinkUp = null;
@@ -53,6 +56,7 @@ namespace GMTubes
 
 		public Boolean LinkDownNull()
 		{
+			if (IsStatic) return false;
 			if (LinkDown == null) return false;
 			countLinksAvailable--;
 			LinkDown = null;
@@ -61,6 +65,7 @@ namespace GMTubes
 		}
 		public Boolean LinkLeftNull()
 		{
+			if (IsStatic) return false;
 			if (LinkLeft == null) return false;
 			countLinksAvailable--;
 			LinkLeft = null;
@@ -69,6 +74,7 @@ namespace GMTubes
 		}
 		public Boolean LinkRightNull()
 		{
+			if (IsStatic) return false;
 			if (LinkRight == null) return false;
 			countLinksAvailable--;
 			LinkRight = null;
@@ -79,7 +85,7 @@ namespace GMTubes
 		/// <summary>
 		/// По умолчанию поворот = 0 и это положение решения (но потом это может быть будет изменено)
 		/// </summary>
-		private int angle = 0;
+		public int angle = 0;
 
 		public int currentAngle = 0;
 
@@ -96,9 +102,9 @@ namespace GMTubes
 			var num = countLinksAvailable;
 			if (num == 4) texnum = 1;
 			if (num == 3){// нужно доопределить на какой угол поворачивать
-				texnum = 2;
+				texnum = 2;angle = 0;
 				if (LinkUp == null) angle = 1;
-				if (LinkLeft == null) angle = 2;
+				if (LinkRight == null) angle = 2;
 				if (LinkDown == null) angle = 3;
 			}
 			if (num == 2){// тут сложнее - надо определиться, прямая труба или изогнутая
@@ -107,10 +113,10 @@ namespace GMTubes
 					texnum = 3;
 					angle = 1;
 				}else{
-					texnum = 4; angle = 0;
-					if (LinkUp == null && LinkRight == null) angle = 1;
-					if (LinkUp == null && LinkLeft == null) angle = 2;
-					if (LinkLeft == null && LinkDown == null) angle = 3;
+					texnum = 4; angle = 3;
+					if (LinkLeft == null && LinkDown == null) angle = 0;
+					if (LinkUp == null && LinkLeft == null) angle = 1;
+					if (LinkUp == null && LinkRight == null) angle = 2;
 				}
 			}
 			currentAngle = angle;
@@ -121,6 +127,7 @@ namespace GMTubes
 		/// </summary>
 		public void Rotate()
 		{
+			_addToRotate -= (90 /*+ 360*/);
 			if (texnum == 1) return;// объект с четыремя связями не вращается
 			currentAngle++;
 			if (texnum == 3){
@@ -129,6 +136,16 @@ namespace GMTubes
 			}
 			if (currentAngle > 3) currentAngle = 0;
 		}
-	
+
+		public int AddRotate()
+		{
+			if (_addToRotate == 0) return 0;
+			var n = _addToRotate/18;
+			if (_addToRotate < -10) n *= 3;
+			_addToRotate -= n;
+			if (_addToRotate >- 2) _addToRotate = 0;
+			return (int)_addToRotate;
+		}
+
 	}
 }

@@ -96,5 +96,10 @@ namespace Engine.Views
 				}
 			}
 		}
+
+		protected override void DrawComponentBackground(VisualizationProvider visualizationProvider)
+		{
+			//base.DrawComponentBackground(visualizationProvider);
+		}
 	}
 }
