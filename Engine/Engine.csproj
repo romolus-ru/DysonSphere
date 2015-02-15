@@ -117,6 +117,7 @@
     <Compile Include="Views\IViewObject.cs" />
     <Compile Include="Views\Templates\Background.cs" />
     <Compile Include="Views\Templates\Button.cs" />
+    <Compile Include="Views\Templates\ButtonTextured.cs" />
     <Compile Include="Views\Templates\InputView.cs" />
     <Compile Include="Views\Templates\IntroView.cs" />
     <Compile Include="Views\View.cs" />
