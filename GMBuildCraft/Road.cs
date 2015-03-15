@@ -24,8 +24,17 @@ namespace GMBuildCraft
 		/// Объект, к которому принадлежит путь
 		/// </summary>
 		public SystemPoint Parent;
+
+		/// <summary>
+		/// Признак глобального пути (путь соединяет не точки звёздной системы а сами звёздные системы)
+		/// </summary>
+		public Boolean IsGlobal = false;
 		public NodePoint NodePoint1;
 		public NodePoint NodePoint2;
+		/// <summary>
+		/// Угол между точками. нужен для задания направления перемещения груза
+		/// </summary>
+		public double Angle;
 		/// <summary>
 		/// Максимальный размер пакета
 		/// </summary>
@@ -159,6 +168,10 @@ namespace GMBuildCraft
 			var pb=new Point(pc.X-p1.Y,pc.Y+p1.X);
 			var r = path.GenerateBezierPathF(a, pa, pb, b, 30);
 			Path = r;
+			double x = a.X - b.X;
+			double y = a.Y - b.Y;
+			var a1 = Math.Atan2(y, x);
+			Angle = a1;
 		}
 
 		/// <summary>
@@ -207,6 +220,14 @@ namespace GMBuildCraft
 					packets.Add(pkt, npnum);
 				}
 			}
+		}
+
+		public int GetDirection(StarPoint starPoint)
+		{
+			var ret = 0;
+			if (starPoint == NodePoint1) ret = 1;
+			if (starPoint == NodePoint2) ret = -1;
+			return ret;
 		}
 	}
 }

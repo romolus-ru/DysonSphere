@@ -77,19 +77,22 @@ namespace Engine.Views.Templates
 		protected override void DrawObject(VisualizationProvider visualizationProvider)
 		{
 			visualizationProvider.RotateReset();
-			DrawComponentBackground(visualizationProvider);
 			String txt;
-			if (CursorOver){
-				txt = "[" + Caption + "]";
-				visualizationProvider.SetColor(Color.Yellow);
-			} else{
-				txt = " " + Caption + " ";
-				visualizationProvider.SetColor(Color.Green);
+			Color color;
+			if (CursorOver){txt = "[" + Caption + "]";color = Color.Yellow;
+			}else{txt = " " + Caption + " ";color = Color.Green;
 			}
-			visualizationProvider.Print(X + 4, Y - 3, txt);
-			visualizationProvider.Rectangle(X, Y, Width, Height);
+			var f = visualizationProvider.FontHeightGet() / 2;
+
+			visualizationProvider.SetColor(color);
+			visualizationProvider.Rectangle(X, Y, Width, Height);// если текстуры будет то они замаскируют этот прямоугольник
+			
+			DrawComponentBackground(visualizationProvider);
+			
+			visualizationProvider.SetColor(color); 
+			visualizationProvider.Print(X + 4, Y + Height / 2 - f - 3, txt);
 			if (Hint != "" && CursorOver){
-				visualizationProvider.Print(X + 10, Y + Height + 5, Hint);
+				visualizationProvider.Print(X + 10, Y + Height + 5-f, Hint);
 			}
 		}
 

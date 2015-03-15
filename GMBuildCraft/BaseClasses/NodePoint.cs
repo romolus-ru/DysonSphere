@@ -41,6 +41,7 @@ namespace GMBuildCraft.BaseClasses
 		public NodePoint(Point point)
 		{
 			Point = point;
+			roads = new List<Road>();
 		}
 
 		/// <summary>

@@ -1,7 +1,10 @@
-﻿namespace Engine.Models
+﻿using System;
+using Engine.Controllers;
+
+namespace Engine.Models
 {
 	/// <summary>
-	/// Интерфейс объекта модели, для унификации
+	/// Интерфейс объекта модели, для унификации (многое взято у IViewModel)
 	/// </summary>
 	public interface IModelObject//:IEngineObject
 	{
@@ -12,9 +15,11 @@
 		void Execute();
 
 		/// <summary>
-		/// Удалить все связи, мешающие объекту удалиться
+		/// Ссылка на контроллер
 		/// </summary>
-		/// <remarks>В частности, ссылки на контроллер, ссылки на различные объекты и т.п.</remarks>
-		void ClearLinks();
+		Controller Controller { get; }
+
+		String Name { get; }
+
 	}
 }

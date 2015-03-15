@@ -7,7 +7,7 @@ namespace GMBuildCraft
 	/// <summary>
 	/// Узловая точка звёздной системы
 	/// </summary>
-	class StarPoint:NodePoint
+	public class StarPoint:NodePoint
 	{
 		/// <summary>
 		/// Тип стоящего здания, в том числе для визуализации
@@ -21,7 +21,23 @@ namespace GMBuildCraft
 		public StarPoint(Point point, StarSystem parent) : base(point)
 		{
 			Parent = parent;
+			AvailableResources=new ResourcesPackets();
+			InitResourcesIn();
 		}
+
+		/// <summary>
+		/// Инициализация ресурсов
+		/// </summary>
+		public void InitResourcesIn()
+		{
+			AvailableResources.SetValue(ResourceEnum.Sepulki,10000);
+			AvailableResources.SetValue(ResourceEnum.Markwi, 10000);
+			AvailableResources.SetValue(ResourceEnum.Pchmy, 10000);
+			AvailableResources.SetValue(ResourceEnum.Iiont, 0);
+			AvailableResources.SetValue(ResourceEnum.Technologies, 1000);
+			AvailableResources.SetValue(ResourceEnum.Artefacts, 1000);
+		}
+
 
 		public override void DoWork()
 		{

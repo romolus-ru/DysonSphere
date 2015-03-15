@@ -54,8 +54,6 @@ namespace GMBuildCraft
 			int cX = width/2;
 			int cY = height/2; // добавляем первый элемент без всяких условий в центр
 			points.Add(new Point(cX, cY));
-			points.Add(new Point(10, 10));
-
 
 			for (int i = 1; i < countPoints; i++){
 				var a = rnd.Next(360);

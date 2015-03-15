@@ -793,7 +793,6 @@ namespace VisualizationOpenGL4
 			gl.ClearColor(backgroundColorR, backgroundColorG, backgroundColorB, backgroundColorA);
 			gl.Clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 			gl.LoadIdentity();
-			//тут. удостовериться что тут код выполняется.
 		}
 
 		public override void FlushDrawing()
@@ -1032,6 +1031,31 @@ namespace VisualizationOpenGL4
 			//Print(30, 100, "Mouse ( " + cursorX + " , " + cursorY + " ).");
 			//Print(30, 120, "Window " + "(" + _oglView.Width + " , " + _oglView.Height + ")."); 
 			#endregion
+		}
+
+		protected override void _CopyToTexture(string textureName)
+		{
+			if (!_textures.ContainsKey(textureName)) return;
+			base._CopyToTexture(textureName);
+			TexStruct texInfo = _textures[textureName];
+			// До копирования экрана в текстуру нужно указать её вызовом glBindTexture()
+			gl.BindTexture(GL.TEXTURE_2D, texInfo.Num);
+
+			// Настал момент, которого мы ждали - мы рендерим экран в текстуру.
+			// Передаем тип текстуры, детализацию, формат пиксела, x и y позицию старта,
+			// ширину и высоту для захвата, и границу. Если вы хотите сохранить только часть
+			// экрана, это легко сделать изменением передаваемых параметров.
+			gl.CopyTexImage2D(GL.TEXTURE_2D, 0, GL.RGB, 0, 0, texInfo.Width, texInfo.Width, 0);
+		}
+
+		protected override void _DeleteTexture(string textureName)
+		{
+			if (!_textures.ContainsKey(textureName)) return;
+			base._DeleteTexture(textureName);
+			// проверяем, есть ли текстура. в крайнем случае можно выдать ошибку тут
+			TexStruct texInfo = _textures[textureName];
+			gl.DeleteTexture(texInfo.Num);
+			_textures.Remove(textureName);
 		}
 	}
 

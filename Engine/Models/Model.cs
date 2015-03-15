@@ -34,7 +34,7 @@ namespace Engine.Models
 
 		private void EHDelObject(object sender, ModelObjectEventArgs modelObjectEventArgs)
 		{
-			modelObjectEventArgs.ModelObject.ClearLinks();
+			//modelObjectEventArgs.ModelObject.ClearLinks();
 			_modelObjects.Remove(modelObjectEventArgs.ModelObject);
 		}
 
@@ -59,6 +59,15 @@ namespace Engine.Models
 			_modelObjects.Remove(modelObject);
 		}
 
+		/// <summary>
+		/// Сделать шаг в алгоритмах модели (одновременно объекты отправят события виду с новой информацией)
+		/// </summary>
+		public void Execute()
+		{
+			foreach (var modelObject in _modelObjects){
+				modelObject.Execute();
+			}
+		}
 
 	}
 }

@@ -67,11 +67,14 @@
     <Compile Include="Application.cs" />
     <Compile Include="Attributes\ClassNameAttribute.cs" />
     <Compile Include="Attributes\HideThisClassAttribute.cs" />
+    <Compile Include="Attributes\LibraryClassAttribute.cs" />
     <Compile Include="Attributes\ReplaceObjectAttribute.cs" />
     <Compile Include="Attributes\aTODOFile.cs" />
     <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Controllers\ControllerEvent.cs" />
     <Compile Include="Controllers\ControllerStoredEvents.cs" />
+    <Compile Include="Controllers\DataSender.cs" />
+    <Compile Include="Controllers\Events\DataRecieveEventArgs.cs" />
     <Compile Include="Controllers\Events\EngineEventArgs.cs" />
     <Compile Include="Controllers\Events\GetCollectorEventArgs.cs" />
     <Compile Include="Controllers\Events\GetHandlerEventArgs.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="Controllers\Events\MessageEventArgs.cs" />
     <Compile Include="Controllers\Events\ModelObjectEventArgs.cs" />
     <Compile Include="Controllers\Events\PointEventArgs.cs" />
+    <Compile Include="Controllers\Events\DrawToTextureEventArgs.cs" />
     <Compile Include="Controllers\Events\SoundLinkEventArgs.cs" />
     <Compile Include="Controllers\Events\StoredEventEventArgs.cs" />
     <Compile Include="Controllers\Events\ViewObjectEventArgs.cs" />
@@ -101,6 +105,7 @@
     <Compile Include="Utils\Editor\Layer.cs" />
     <Compile Include="Utils\ExtensionMethods\extensions.cs" />
     <Compile Include="Utils\ExtensionMethods\MayBe.cs" />
+    <Compile Include="Utils\ExtensionMethods\Serialization.cs" />
     <Compile Include="Utils\FileArchieve.cs" />
     <Compile Include="Utils\GraphView\GraphicLine.cs" />
     <Compile Include="Utils\GraphView\ViewGraph.cs" />
@@ -109,6 +114,7 @@
     <Compile Include="Utils\Path\PathGeneratorBezier.cs" />
     <Compile Include="Utils\Path\PathPart.cs" />
     <Compile Include="Utils\Path\Point.cs" />
+    <Compile Include="Utils\RandomNameGenerator.cs" />
     <Compile Include="Utils\Settings\Settings.cs" />
     <Compile Include="Utils\Settings\SettingsRow.cs" />
     <Compile Include="Utils\StateOne.cs" />
@@ -117,7 +123,7 @@
     <Compile Include="Views\IViewObject.cs" />
     <Compile Include="Views\Templates\Background.cs" />
     <Compile Include="Views\Templates\Button.cs" />
-    <Compile Include="Views\Templates\ButtonTextured.cs" />
+    <Compile Include="Views\Templates\ButtonImage.cs" />
     <Compile Include="Views\Templates\InputView.cs" />
     <Compile Include="Views\Templates\IntroView.cs" />
     <Compile Include="Views\View.cs" />

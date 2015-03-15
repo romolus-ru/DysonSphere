@@ -36,6 +36,7 @@ namespace GMBuildCraft
 			// добавляем дороги
 			for (int i = 0; i < Points.Count - 1; i++){
 				for (int j = 1; j < Points.Count; j++){
+					if (i == j) continue;
 					var d = MapGenerator.Distance(Points[i], Points[j]);
 					if (d>dMax)continue;
 					var r = new Road(Points[i], Points[j]);
@@ -52,7 +53,11 @@ namespace GMBuildCraft
 						if (road.NodePoint1 == Points[j] && road.NodePoint2 == Points[i]) oneway = false;
 					}
 					if (!oneway) continue;
-					if (!intersect) Roads.Add(r);// нету пересечений - добавляем дорогу
+					if (!intersect) {
+						Roads.Add(r);// нету пересечений - добавляем дорогу
+						r.NodePoint1.roads.Add(r);// добавляем дороги к точке пути
+						r.NodePoint2.roads.Add(r);
+					}
 				}
 			}
 		}

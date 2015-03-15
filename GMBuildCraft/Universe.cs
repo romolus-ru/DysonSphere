@@ -34,6 +34,7 @@ namespace GMBuildCraft
 			// добавляем пути между звёздными системами
 			for (int i = 0; i < Points.Count - 1; i++){
 				for (int j = 1; j < Points.Count; j++){
+					if (i == j) continue;
 					var d = MapGenerator.Distance(Points[i], Points[j]);
 					if (d > 60) continue;
 					var intersect = false;
@@ -73,14 +74,17 @@ namespace GMBuildCraft
 			var a = Math.Atan2(y, x);
 
 			var point1 = way.NodePoint1 as StarSystem;
-			NodePoint np1 = GenerateWayNodePoints1(a, point1);
+			NodePoint np1 = GenerateWayNodePoints1(-a, point1);
 			var point2 = way.NodePoint2 as StarSystem;
 			NodePoint np2 = GenerateWayNodePoints1(a, point2);
 			if (np1==null||np2==null){throw new Exception("Нету возможности создать дорогу");}
 			// обе точки в обоих звёздных системах созданы - теперь формируем путь
 			var w = new Road(np1, np2);// точки разделены между собой очень большим расстоянием!
+			w.IsGlobal = true;
 			w.CreatePath(point1.Point, point2.Point);
 			Ways.Add(w);// но сам путь принадлежит вселенной, поэтому при выводе проблем не должно быть
+			np1.roads.Add(w);// добавляем дороги, нужно для вывода стрелок и т.п.
+			np2.roads.Add(w);
 		}
 
 		private static NodePoint GenerateWayNodePoints1(double a, StarSystem point1)

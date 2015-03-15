@@ -70,7 +70,20 @@ namespace Engine.Views
 		protected virtual void HandlersRemover()
 		{
 		}
-		
+
+		/// <summary>
+		/// Прорисовка объекта для текстуры
+		/// </summary>
+		/// <param name="visualizationProvider">Объект-визуализатор</param>
+		public void DrawToTexture(VisualizationProvider visualizationProvider)
+		{
+			if (CanDraw)
+			{
+				DrawObjectToTexture(visualizationProvider);
+			}
+		}
+
+
 		/// <summary>
 		/// Прорисовка объекта
 		/// </summary>
@@ -92,6 +105,15 @@ namespace Engine.Views
 		{
 			HandlersAddThis();
 			Show();// по умолчанию объект показываем
+		}
+
+		/// <summary>
+		/// Прорисовка объекта для текстуры. Без проверки на необходимость вывода на экран
+		/// </summary>
+		/// <param name="visualizationProvider"></param>
+		protected virtual void DrawObjectToTexture(VisualizationProvider visualizationProvider)
+		{
+
 		}
 
 		/// <summary>

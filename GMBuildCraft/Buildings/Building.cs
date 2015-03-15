@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GMBuildCraft.Upgrades;
+using Engine.Attributes;
 
 namespace GMBuildCraft.Buildings
 {
@@ -11,6 +13,8 @@ namespace GMBuildCraft.Buildings
 	/// Основа для всех зданий
 	/// </summary>
 	/// <remarks>Сделан отдельно для безболезненной замены здания у узловой точки</remarks>
+	[LibraryClass("Building","1.0")]
+	[DebuggerDisplay("IsConstucted={IsConstucted}")]
 	public class Building
 	{
 		/// <summary>
@@ -42,6 +46,17 @@ namespace GMBuildCraft.Buildings
 		/// Список строящихся улучшений
 		/// </summary>
 		public List<Upgrade> UpgradesToBuild;
+
+		public Building()
+		{
+			Stored=new ResourcesPackets();
+			Stored.SetValue(ResourceEnum.Sepulki, 0);
+			Stored.SetValue(ResourceEnum.Markwi, 0);
+			Stored.SetValue(ResourceEnum.Pchmy, 0);
+			Stored.SetValue(ResourceEnum.Iiont, 0);
+			Stored.SetValue(ResourceEnum.Technologies, 0);
+			Stored.SetValue(ResourceEnum.Artefacts, 0);
+		}
 
 		/// <summary>
 		/// Установить значения с учётом улучшений

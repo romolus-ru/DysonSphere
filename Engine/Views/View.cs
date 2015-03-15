@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Engine.Controllers;
 using Engine.Controllers.Events;
 
@@ -13,6 +14,8 @@ namespace Engine.Views
 		/// Пауза для запрета обработки кнопки
 		/// </summary>
 		public static int Pause = 30;
+
+		private List<DrawToTextureEventArgs> _drawToTexture = new List<DrawToTextureEventArgs>();
 
 		/// <summary>
 		/// Класс для объекта визуализации
@@ -38,7 +41,14 @@ namespace Engine.Views
 			controller.AddEventHandler("ViewBringToFront", EHBringToFront);
 			controller.AddEventHandler("ViewAddObject", (o, args) => EHAddObject(o, args as ViewObjectEventArgs));
 			controller.AddEventHandler("ViewDelObject", (o, args) => EHDelObject(o, args as ViewObjectEventArgs));
+			controller.AddEventHandler("ViewDrawToTexture", (o, args) => EHDrawToTexture(o, args as DrawToTextureEventArgs));
 
+		}
+
+		private void EHDrawToTexture(object sender, DrawToTextureEventArgs drawToTextureEventArgs)
+		{
+			// сохраняем переданные параметры
+			_drawToTexture.Add(drawToTextureEventArgs);
 		}
 
 		private void EHAddObject(object sender, ViewObjectEventArgs viewObjectEventArgs)
@@ -86,5 +96,16 @@ namespace Engine.Views
 			_visualizationProvider.FlushDrawing();
 		}
 
+		/// <summary>
+		/// Рисование в текстуру
+		/// </summary>
+		public void DrawToTexture()
+		{
+			foreach (var argse in _drawToTexture){
+				_visualizationProvider.BeginDraw();
+				argse.ViewObject.DrawToTexture(_visualizationProvider);
+				_visualizationProvider.CopyToTexture(argse.TextureName);
+			}
+		}
 	}
 }

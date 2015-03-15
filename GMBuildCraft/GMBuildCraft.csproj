@@ -41,11 +41,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buildings\Building.cs" />
+    <Compile Include="Buildings\BuildingDescriptions.cs" />
     <Compile Include="Buildings\BuildingMining.cs" />
     <Compile Include="Buildings\BuildingStore.cs" />
     <Compile Include="Buildings\BuildingType.cs" />
+    <Compile Include="Buildings\BuildingDescription.cs" />
     <Compile Include="Limiters\Limiter.cs" />
     <Compile Include="Limiters\LimitersList.cs" />
+    <Compile Include="ResourcesDescription.cs" />
+    <Compile Include="ResourcesDesctiptions.cs" />
     <Compile Include="StarPoint.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="GMBuildCraft.cs" />

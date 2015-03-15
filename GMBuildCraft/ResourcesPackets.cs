@@ -19,9 +19,12 @@ namespace GMBuildCraft
 		public ResourcesPackets()
 		{
 			Resources=new List<ResourcePacket>();
-			Resources.Add(new ResourcePacket(ResourceEnum.Wood, 0));
-			Resources.Add(new ResourcePacket(ResourceEnum.Metal, 0));
-			Resources.Add(new ResourcePacket(ResourceEnum.Sand, 0));
+			Resources.Add(new ResourcePacket(ResourceEnum.Sepulki, 10000));
+			Resources.Add(new ResourcePacket(ResourceEnum.Markwi, 10000));
+			Resources.Add(new ResourcePacket(ResourceEnum.Pchmy, 0));
+			Resources.Add(new ResourcePacket(ResourceEnum.Iiont, 10000));
+			Resources.Add(new ResourcePacket(ResourceEnum.Technologies, 100));
+			Resources.Add(new ResourcePacket(ResourceEnum.Artefacts, 100));
 		}
 
 		/// <summary>

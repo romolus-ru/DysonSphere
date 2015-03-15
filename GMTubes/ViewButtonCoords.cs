@@ -10,11 +10,8 @@ using Engine.Views.Templates;
 
 namespace GMTubes
 {
-	class ViewButtonCoords:Button
+	class ViewButtonCoords:ButtonImage
 	{
-		public ViewButtonCoords(Controller controller, ViewComponent parent) : base(controller, parent)
-		{}
-
 		public int Selected = -1;
 
 		/// <summary>
@@ -26,6 +23,10 @@ namespace GMTubes
 		/// Максимальное значение координаты
 		/// </summary>
 		public int b2 = 10;
+
+		public ViewButtonCoords(Controller controller, ViewComponent parent, string btnTexture, string btnTextureOver)
+			: base(controller, parent, btnTexture, btnTextureOver)
+		{}
 
 		public override void Cursor(object o, PointEventArgs args)
 		{

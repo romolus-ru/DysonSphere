@@ -157,5 +157,12 @@ namespace Engine.Views
 			return base.InRange(x, y);
 		}
 
+		protected override void DrawComponentBackground(VisualizationProvider visualizationProvider)
+		{
+			base.DrawComponentBackground(visualizationProvider);
+			if (CursorOver) visualizationProvider.SetColor(Color.DodgerBlue, 20);
+			else visualizationProvider.SetColor(Color.DimGray, 50);
+			visualizationProvider.Box(X, Y, Width, Height);
+		}
 	}
 }

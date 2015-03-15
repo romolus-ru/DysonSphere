@@ -176,9 +176,9 @@ namespace Engine.Views
 		/// <param name="visualizationProvider"></param>
 		protected virtual void DrawComponentBackground(VisualizationProvider visualizationProvider)
 		{
-			if (CursorOver)	visualizationProvider.SetColor(Color.DodgerBlue, 20);
-			else			visualizationProvider.SetColor(Color.DimGray, 50);
-			visualizationProvider.Box(X, Y, Width, Height);
+			//if (CursorOver)	visualizationProvider.SetColor(Color.DodgerBlue, 20);
+			//else			visualizationProvider.SetColor(Color.DimGray, 50);
+			//visualizationProvider.Box(X, Y, Width, Height);
 		}
 
 		/// <summary>

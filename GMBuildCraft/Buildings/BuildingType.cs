@@ -17,7 +17,7 @@ namespace GMBuildCraft
 		/// </summary>
 		Storage,
 		/// <summary>
-		/// Большой склад
+		/// Большой склад. Больше чем вселенский, потому что вселенский промежуточный, а этот основательный. Но должен быть дорогим
 		/// </summary>
 		StorageBig,
 		/// <summary>
@@ -27,24 +27,24 @@ namespace GMBuildCraft
 		/// <summary>
 		/// Технология для апгрейда зданий - игрок выбирает здание и какой апгрейд туда надо установить.
 		/// </summary>
-		StarTechnology1,
+		MiningTechnology,
 		/// <summary>
 		/// Ещё более редкий ресурс для апгрейда зданий
 		/// </summary>
-		StarTechnology2,
+		MiningArtefacts,
 		/// <summary>
 		/// Преобразовывает любой ресурс в любой другой. апгрейдится.
 		/// </summary>
 		Converter,
-		Mining1,
-		Mining2,
-		Mining3,
-		Mining4,
-		Mining5,
+		MiningSepulki,
+		MiningMarkwi,
+		MiningPchmy,
+		MiningIiont,
+		FactoryTechnologies,
+		FactoryArtefacts,
 		Factory1,
 		Factory2,
 		Factory3,
 		Factory4,
-		Factory5
 	}
 }

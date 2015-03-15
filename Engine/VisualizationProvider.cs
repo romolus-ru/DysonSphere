@@ -21,7 +21,7 @@ namespace Engine
 
 		protected Controller _controller;
 
-		public Version Version = new Version(0, 0);
+		public Version Version = new Version(0, 2);
 
 		/// <summary>
 		/// Ширина окна визуализации
@@ -332,6 +332,21 @@ namespace Engine
 
 		protected virtual void _DrawTextureMasked(int x, int y, String textureName, String textureMaskName) { }
 
+		/// <summary>
+		/// скопировать изображение с экрана в текстуру
+		/// </summary>
+		/// <param name="textureName"></param>
+		public void CopyToTexture(String textureName)
+		{ _CopyToTexture(textureName); }
+
+		protected virtual void _CopyToTexture(String textureName) { }
+
+		public void DeleteTexture(String textureName)
+		{ _DeleteTexture(textureName); }
+
+		protected virtual void _DeleteTexture(String textureName){}
+
+
 		///// <summary>
 		///// Вывести на экран повёрнутую текстуру
 		///// </summary>
@@ -354,6 +369,12 @@ namespace Engine
 		/// Высота шрифта. по умолчанию = 16
 		/// </summary>
 		protected int FontHeight = 16;
+
+		/// <summary>
+		/// Получить высоту шрифта. в C#5 можно будет объединить с объявлением переменной, сейчас нельзя из-за инициализации переменной сделать обычный get set
+		/// </summary>
+		/// <returns></returns>
+		public int FontHeightGet(){return FontHeight;}
 
 		/// <summary>
 		/// Загрузить шрифт по имени 

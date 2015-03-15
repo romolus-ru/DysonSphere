@@ -20,6 +20,5 @@ namespace Engine.Views.Templates
 			_textureName = textureName;
 		}
 
-
 	}
 }

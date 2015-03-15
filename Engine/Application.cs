@@ -59,6 +59,14 @@ namespace Engine
 		///// </summary>
 		//private ModuleParams parameters;
 
+		/// <summary>
+		/// Отправка данных клиенту
+		/// </summary>
+		private readonly DataSender _toModelDataSender;
+
+		private readonly DataSender _toViewDataSender;
+
+
 		#endregion
 
 		/// <summary>
@@ -144,6 +152,9 @@ namespace Engine
 			_sound = new Sound(isound);
 			_sound.Init(_controller);
 
+			_toModelDataSender = new DataSender(_controller, "SendToModel");// создаём отправителя сообщений Модели (фактически серверу)
+			_toViewDataSender = new DataSender(_controller, "SendToView");// создаём отправителя сообщений Виду (фактически клиенту)
+
 			// запуск всех модулей
 			//ModulesRun();
 			// запуск одного модуля из настроек
@@ -155,7 +166,6 @@ namespace Engine
 
 			_controller.SendError("Создание объекта Application завершено");
 			_controller.StartEvent("SystemStarted");// передаём все сообщения объектам
-
 		}
 
 		/// <summary>

@@ -6,12 +6,14 @@ namespace Engine.Views
 	/// <summary>
 	/// Интерфейс объекта визуализации, для унификации
 	/// </summary>
-	interface IViewObject:IEngineObject
+	public interface IViewObject:IEngineObject
 	{
 		/// <summary>
 		/// Ссылка на контроллер
 		/// </summary>
 		Controller Controller { get; }
+
+		void DrawToTexture(VisualizationProvider visualizationProvider);
 
 		void Draw(VisualizationProvider visualizationProvider);
 

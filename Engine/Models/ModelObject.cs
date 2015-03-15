@@ -1,37 +1,10 @@
-﻿using Engine.Controllers;
+﻿using System;
+using Engine.Controllers;
 
 namespace Engine.Models
 {
 	public class ModelObject : IModelObject
 	{
-		/// <summary>
-		/// Уникальный номер, присваивается моделью
-		/// </summary>
-		public int UniqueNum { get; protected set; }
-
-		/// <summary>
-		/// Установить необходимые события
-		/// </summary>
-		/// <param name="controller"></param>
-		public virtual void SetEvents(Controller controller)
-		{ }
-
-		public ModelObject(){}
-
-		public void SetUniqueNum(int uniqueNum)
-		{
-			UniqueNum = uniqueNum;
-		}
-
-		/// <summary>
-		/// Получить уникальный номер объекта
-		/// </summary>
-		/// <returns></returns> 
-		public int GetUniqueNum()
-		{
-			return UniqueNum;
-		}
-
 		/// <summary>
 		/// Выполнить шаг в алгоритме мат. объекта
 		/// </summary>
@@ -41,21 +14,107 @@ namespace Engine.Models
 		}
 
 		/// <summary>
-		/// Удалить все связи, мешающие объекту удалиться
+		/// Ссылка на контроллер
 		/// </summary>
-		/// <remarks>В частности, ссылки на контроллер, ссылки на различные объекты и т.п.</remarks>
-		public virtual void ClearLinks()
-		{
+		public Controller Controller { get; private set; }
 
+		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="controller">Контроллер</param>
+		public ModelObject(Controller controller)
+		{
+			// работа с событиями, создание и подключение
+			Controller = controller;
+		}
+
+		private Boolean HandlersAdded = false;
+		private Boolean HandlersRemoved = false;
+
+		/// <summary>
+		/// Добавить обработчики
+		/// </summary>
+		/// <remarks>Можно вызывать много раз - добавится всё равно только 1</remarks>
+		public void HandlersAddThis()
+		{
+			if (HandlersAdded) return;// проверка
+			HandlersAdder();// добавляем
+			HandlersAdded = true;
+			HandlersRemoved = false;// разрешаем удалить
 		}
 
 		/// <summary>
-		/// получить имя стратегии по умолчанию
+		/// Удалить обработчики
 		/// </summary>
-		/// <returns></returns>
-		public virtual string GetDefaultStrategyName()
+		/// <remarks>Можно вызывать много раз - удалится всё равно только 1</remarks>
+		public void HandlersRemoveThis()
 		{
-			return "defaultNone";
+			if (HandlersRemoved) return;//проверка
+			HandlersRemover();//удаляем
+			HandlersRemoved = true;
+			HandlersAdded = false;//разрешаем добавить
+		}
+		/// <summary>
+		/// Добавить обработчики
+		/// </summary>
+		/// <remarks>Предназначения для переопределения пользователем</remarks>
+		protected virtual void HandlersAdder()
+		{
+		}
+	
+		/// <summary>
+		/// Удалить обработчики
+		/// </summary>
+		/// <remarks>Предназначена для переопределения пользователем</remarks>
+		protected virtual void HandlersRemover()
+		{
+		}
+		
+		/// <summary>
+		/// Имя объекта
+		/// </summary>
+		public String Name { get; set; }
+
+		/// <summary>
+		/// Для блокировки дополнительных вызовов dispose
+		/// </summary>
+		private Boolean _disposed = false;
+
+		/// <summary>
+		/// Удаление, можно дополнить у потомков
+		/// </summary>
+		public virtual void Dispose()
+		{
+			if (!_disposed)
+			{
+				HandlersRemoveThis();
+				Controller = null;
+				_disposed = true;
+			}
+		}
+
+		/// <summary>
+		/// Деструктор
+		/// </summary>
+		~ModelObject()
+		{
+			Dispose();
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -28,6 +28,12 @@ namespace Engine.Utils
 			new Dictionary<string, Dictionary<string, Type>>();
 
 		/// <summary>
+		/// Библиотечные классы
+		/// </summary>
+		private readonly Dictionary<string, Dictionary<Version, Type>> _libClasses=
+			new Dictionary<string, Dictionary<Version, Type>>();
+
+		/// <summary>
 		/// Конструктор
 		/// </summary>
 		/// <param name="controller"></param>
@@ -83,7 +89,57 @@ namespace Engine.Utils
 					if (r) ret = true;
 				}
 			}
+			if (SearchLibraryObjects(assembly)) ret = true;
 			return ret;
+		}
+
+		/// <summary>
+		/// Поиск в переданной сборке объектов с атрибутом LibraryClass
+		/// </summary>
+		/// <param name="assembly">Сборка</param>
+		private Boolean SearchLibraryObjects(Assembly assembly)
+		{
+			var ret = false;
+			Type[] types = assembly.GetTypes();
+			foreach (Type type in types){
+				// проверяем доступность атрибута для данного типа
+				var typeObjName = typeof (LibraryClassAttribute);
+				if (!Attribute.IsDefined(type, typeObjName))continue;// атрибут отсутствует - смотрим следующий класс
+				// атрибут определён - получаем его
+				var attr = (LibraryClassAttribute)Attribute.GetCustomAttribute(type, typeObjName);
+				AddTypeToLibraryObjects(attr, type);
+				ret = true;
+			}
+			return ret;
+		}
+
+		/// <summary>
+		/// Добавить найденный тип в коллектор к библиотечным классам
+		/// </summary>
+		/// <param name="attr"></param>
+		/// <param name="type"></param>
+		private void AddTypeToLibraryObjects(LibraryClassAttribute attr, Type type)
+		{
+			string s = attr.Name;
+			// если объект не существует, добавляем словарь
+			if (!_libClasses.ContainsKey(s)){
+				// если нету ещё такого списка - создаём
+				var dictionary = new Dictionary<Version, Type>();
+				_libClasses[s] = dictionary;
+			}
+			// получаем внутренний словарь, соответствующий типу objectType
+			var libClasses = _libClasses[s];
+			// смотрим, есть ли с таким ключом уже значение
+			if (libClasses.ContainsKey(attr.Version)){
+				// совпадение версии нового объекта и уже записанного в коллектор
+				var ea = MessageEventArgs.Msg("Ошибка при добавлении библиотечного объекта в коллектор. Совпадение версии " +
+				                              Environment.NewLine + libClasses.ToString() + "/" + s.ToString());
+				_errorEvent.StartEvent(null, ea);
+			}
+			else{
+				// нету такого значения - добавляем без вопросов
+				libClasses.Add(attr.Version, type);
+			}
 		}
 
 		/// <summary>
@@ -239,6 +295,28 @@ namespace Engine.Utils
 			return o;
 		}
 
+		/// <summary>
+		/// создаёт объект типа keyType по имени objName из общего списка объектов
+		/// </summary>
+		/// <param name="objName">Имя объекта, который надо создать</param>
+		/// <param name="minVersion">Минимальная версия, которую надо создать</param>
+		/// <returns></returns>
+		public Object CreateLibraryClass(string objName, Version minVersion=null)
+		{
+			object o = null;// создаём объект активатором или возвращаем нул
+			if (_libClasses.ContainsKey(objName)){
+				Version v = minVersion;
+				if (v == null) { { v=new Version("0.0");} }
+				var types = _libClasses[objName];
+				var types2 = types.OrderBy(t => t.Key).FirstOrDefault();// получили первый элемент 
+				if (types2.Value == null){return null;}// нету элемента - возвращаем null
+				var ver = types2.Key;// проверяем версию. если совпадает или новее - возвращаем
+				if (ver>=minVersion){
+					o = Activator.CreateInstance(types2.Value);
+				}
+			}
+			return o;
+		}
 		/// <summary>
 		/// позволяет создать только 1 экземпляр объекта. после создания удаляет его описание
 		/// </summary>
