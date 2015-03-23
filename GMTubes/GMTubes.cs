@@ -10,6 +10,7 @@ using Engine.Utils.Settings;
 using Engine.Views;
 using Engine.Utils.Editor;
 using Engine.Views.Templates;
+using GMTubes.Model;
 using Button = Engine.Views.Templates.Button;
 
 namespace GMTubes
@@ -52,7 +53,7 @@ namespace GMTubes
 			_vf.Hide();
 			_vf.SetF(_f);
 
-			background = new Background(controller);
+			background = new Background(controller,null,@"..\Resources\gmTubes\wp1.jpg","GMTubesWP1");
 			_sys.AddComponent(background);
 
 			// сначала создаётся и запускается меню. из него выбираются параметры запуска
@@ -246,11 +247,16 @@ namespace GMTubes
 			_graph.AddGraphLine("Высота", Color.MidnightBlue, maxh);
 			_graph.AddGraphLine("Ширина", Color.MediumVioletRed, maxw);
 			_graph.AddGraphLine("Золото", Color.DarkGoldenrod, tGold);
-			_graph.AddGraphLine("Серебро", Color.Silver, tSilver);
-			_graph.AddGraphLine("3х элементы ", Color.SeaGreen, max3x);
-			_graph.AddGraphLine("4х элементы", Color.SteelBlue, max4x);
-			_graph.AddGraphLine("Размер поля", Color.SeaGreen, fsize);
-			_graph.AddGraphLine("Размер поля2", Color.SeaGreen, fsize2);
+			//_graph.AddGraphLine("Серебро", Color.Silver, tSilver);
+			//_graph.AddGraphLine("3х элементы ", Color.SeaGreen, max3x);
+			//_graph.AddGraphLine("4х элементы", Color.SteelBlue, max4x);
+			//_graph.AddGraphLine("Размер поля", Color.SeaGreen, fsize);
+			//_graph.AddGraphLine("Размер поля2", Color.SeaGreen, fsize2);
+			var fsine = new List<PointF>();
+			for (int i = 1; i < 90; i++){
+				fsine.Add(new PointF(i, (float)(10 * Math.Sin(Math.PI * i * 5 / 180.0))));
+			}
+			_graph.AddGraphLine("Синус", Color.Black, fsine);
 			_sys.AddComponent(_graph);
 			_sys.BringToFront(_graph);
 		}

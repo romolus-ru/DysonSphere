@@ -41,8 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Field.cs" />
-    <Compile Include="FieldPoint.cs" />
+    <Compile Include="Model\Field.cs" />
+    <Compile Include="Model\FieldPoint.cs" />
     <Compile Include="GMTubes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInfo.cs" />

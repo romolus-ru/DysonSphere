@@ -152,51 +152,16 @@ namespace Engine.Utils.GraphView
 		private void SetParams()
 		{
 			if (_gls.Count < 1) return;
-			var gl1 = _gls[0];
-			float maxDX = float.MaxValue;//gl1.maxX - gl1.minX;
-			float maxDY = float.MaxValue;//gl1.maxY - gl1.minY;
-			foreach (var gl in _gls){if (!gl.Visible) continue;
-				maxDX = gl1.maxX - gl1.minX;maxDY = gl1.maxY - gl1.minY;
-				break;
-			}
-			if (Math.Abs(maxDX - float.MaxValue) < 0.0001f) return;
-			// узнать общую масимальную область, занимаемую всеми линиями
-			foreach (var gl in _gls){
-				if (!gl.Visible) continue;
-				var maxDX1 = gl.maxX - gl.minX;
-				var maxDY1 = gl.maxY - gl.minY;
-				if (maxDX < maxDX1) maxDX = maxDX1;
-				if (maxDY < maxDY1) maxDY = maxDY1;
-
-			}
 			// вычислить для каждой линии масштаб
 			foreach (var gl in _gls){// приводим все объекты к масштабу 800х600(сам график должен вписаться в эти размеры)
-				var maxDX1 = gl.maxX - gl.minX;
-				maxDX = maxDX1;// общий масштаб не используем
-				float mx;
-				float scaleX = 0.5f;// делим пополам начальный масштаб
-				do{// увеличиваем масштаб что бы он отображался вписываясь в максимальные размеры линий
-					scaleX *= 2;
-					mx = maxDX1*scaleX/maxDX;
-				} while (mx < 0.5);
-
-				var maxDY1 = gl.maxY - gl.minY;
-				maxDY = maxDY1;// общий масштаб не используем
-				float my;
-				var scaleY = 0.5f;// делим пополам начальный масштаб
-				do{// увеличиваем масштаб что бы он отображался вписываясь в максимальные размеры линий
-					scaleY *= 2;
-					my = maxDY1 * scaleY / maxDY;
-				} while (my < 0.5);
-
-				// теперь у нас есть 2 масштаба, надо выбрать из них один, а второй вычислить
-				float k =600f/800f;// коэффициент размеров графиков
-				float scaleAll;
-				if ((scaleX*k < scaleY)){//график вытянут вверх - причесываем
-					scaleAll = 800 / maxDX1;
-				}else{
-					scaleAll = 600 / maxDY1;
-				}
+				var w = (gl.maxX - gl.minX); if (w < 0.1f) w = 1;
+				var h = (gl.maxY - gl.minY); if (h < 0.1f) h = 1;
+				var scaleX1 = 800/w;
+				if (scaleX1 < 0.01f) scaleX1 = 1;
+				var scaleY1 = 600/h;
+				float scaleAll = 0f;
+				if (scaleY1 > scaleX1) scaleAll = scaleX1;
+				else scaleAll = scaleY1;
 				gl.Scale = scaleAll;
 
 				// рассчитываем точки которые теперь будут выводиться

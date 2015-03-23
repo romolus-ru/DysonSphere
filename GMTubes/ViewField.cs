@@ -6,6 +6,7 @@ using Engine.Controllers;
 using Engine.Controllers.Events;
 using Engine.Utils;
 using Engine.Views;
+using GMTubes.Model;
 
 namespace GMTubes
 {
