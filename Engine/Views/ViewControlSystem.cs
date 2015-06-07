@@ -54,7 +54,8 @@ namespace Engine.Views
 					var c = component as ViewControl;
 					if (c == null) continue;// компонент уровня контрол и умеет передавать событие курсора вложенным компонентам
 					c.DeliverCursorEH(o, args);
-					if (c.CursorOver) cOver = true;
+					if (c.CursorOver) 
+						cOver = true;
 				}
 			}
 		}

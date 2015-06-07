@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
+using Engine.Controllers;
+using Engine.Controllers.Events;
+using Engine.Models;
+using Engine.Utils.ExtensionMethods;
+using GMTubes.Controllers;
 
 namespace GMTubes.Model
 {
 	/// <summary>
-	/// Поле
+	/// Модель поля
 	/// </summary>
-	class Field
+	class Field:ModelObject
 	{
 		#region Переменные
 
@@ -26,7 +31,7 @@ namespace GMTubes.Model
 		public int TimeGold { get; private set; }
 		public int TimeSilver { get; private set; }
 
-		public int MaxW;
+		public int MaxW;// текущие максимальная высота и ширина
 		public int MaxH;
 		public int Max4x;
 		public int Max3x;
@@ -40,16 +45,79 @@ namespace GMTubes.Model
 
 		private Random _rnd = new Random();
 
-		public int LevelCost = 0;
+		public int LevelCost = 0;// используется. но проще заменить на вызов функции
 		public Stopwatch Time;
 
 		#endregion
 
-		public Field(int level)
+		public Field(Controller controller):base(controller)
 		{
-			InitCreationParams(level);
-			Data = GenerateField(MaxW,MaxH,Max4x,Max3x,MaxHl);//5, 5, 2, 5, 2);
-			Time=new Stopwatch();
+			Controller.AddEventHandler("GMTubesCreateField", GMTubesCreateFieldEH);
+			Controller.AddEventHandler("GMTubesTimeContinue", GMTubesTimeContinueEH);
+			Controller.AddEventHandler("GMTubesTimePause", GMTubesTimePauseEH);
+			Controller.AddEventHandler("GMTubesRotateClick", GMTubesRotateClickEH);
+		}
+
+		private void GMTubesRotateClickEH(object sender, EventArgs e)
+		{
+			var ec = e as MessageEventArgs;
+			GMTubesRotateClick(sender, ec.Deserialize<RotateClickEventArgs>(e));
+		}
+		private void GMTubesRotateClick(object sender, RotateClickEventArgs e)
+		{
+			var p = Data[e.I, e.J];
+			if (p == null) throw new Exception("Ошибка - отправлены несуществующие координаты");
+
+			p.Rotate();
+			// надо отправить событие вращения обратно с учётом нового угла поворота
+			var e1 = RotatedEventArgs.Create(p.i, p.j, p.currentAngle);
+			Controller.SendToViewCommand("GMTubesRotated", e1);
+
+			if (VerifyCurrent() == ""){
+				Time.Stop();
+				// если возмущений нету то значит уровень пройден, надо через некоторое время отправить пользователю сообщение о прохождении
+				Controller.AddToStore(this, StoredEventEventArgs.StoredSeconds(2, "GMTubesFieldResolved", this, EventArgs.Empty));
+			}
+		}
+
+		private void GMTubesTimeContinueEH(object sender, EventArgs e)
+		{
+			var e1 = ElapsedTimeEventArgs.Send(Time.Elapsed.TotalSeconds);
+			Controller.SendToViewCommand("GMTubesTimeElapsed", e1);
+			Time.Start();
+		}
+
+		private void GMTubesTimePauseEH(object sender, EventArgs e)
+		{
+			Time.Stop();
+		}
+
+		private void GMTubesCreateFieldEH(object sender, EventArgs e)
+		{
+			var ec = e as MessageEventArgs;
+			GMTubesCreateField(sender, ec.Deserialize<CreateFieldEventArgs>(e));
+		}
+		private void GMTubesCreateField(object sender, CreateFieldEventArgs e)
+		{
+			InitCreationParams(e.UserLevel);
+			Data = GenerateField(MaxW, MaxH, Max4x, Max3x, MaxHl);//5, 5, 2, 5, 2);
+			Time = new Stopwatch();
+			Time.Stop();
+			var fi = new FieldInfoEventArgs();
+			fi.FieldWidth = MaxW;
+			fi.FieldHeight = MaxH;
+			fi.FieldTimeSilver = TimeSilver;
+			fi.FieldTimeGold = TimeGold;
+			for (int i = 0; i < MaxWidth; i++){
+				for (int j = 0; j < MaxHeight; j++){
+					var p = Data[i, j];
+					if (p == null) continue;// но зачем то я хотел отправить пустые объекты
+					var texnum = 0;var ca = 0;var isvis = false;
+					if (p != null){texnum = p.texnum;ca = p.currentAngle;isvis = true;}
+					fi.Add(texnum, i, j, isvis, ca);
+				}
+			}
+			Controller.SendToViewCommand("GMTubesFieldInfo", fi);
 		}
 
 		#region Генерация поля
@@ -505,11 +573,6 @@ namespace GMTubes.Model
 					var f1 = Data[i, j];
 					if (f1 == null) continue;
 					var fn = f[i, j];
-					//if (f1.LinkDown != null) fn.LinkDown = fLink;
-					//if (f1.LinkLeft != null) fn.LinkLeft = fLink;
-					//if (f1.LinkRight != null) fn.LinkRight = fLink;
-					//if (f1.LinkUp != null) fn.LinkUp=fLink;
-
 					if (f1.LinkDown != null) VerifyCurrentSetLink(fn, fLink, 0);
 					if (f1.LinkLeft != null) VerifyCurrentSetLink(fn, fLink, 1);
 					if (f1.LinkUp != null) VerifyCurrentSetLink(fn, fLink, 2);
@@ -599,18 +662,6 @@ namespace GMTubes.Model
 
 		}
 
-		/// <summary>
-		/// 0 бронза, 1 серебро, 2 золото
-		/// </summary>
-		/// <returns></returns>
-		public int LevelTimeInterval()
-		{
-			var ret = 0;
-			if (Time.Elapsed.TotalSeconds < TimeSilver) ret = 1;
-			if (Time.Elapsed.TotalSeconds < TimeGold) ret = 2;
-			return ret;
-		}
-
 		private void VerifyCountLinks(FieldPoint[,] f)
 		{
 			for (int i = 0; i < MaxWidth; i++){
@@ -628,6 +679,18 @@ namespace GMTubes.Model
 			}
 
 		}
+		/// <summary>
+		/// 0 бронза, 1 серебро, 2 золото (у вида такая же. что бы не передавать данные)
+		/// </summary>
+		/// <returns></returns>
+		public int LevelTimeInterval()
+		{
+			var ret = 0;
+			if (Time.Elapsed.TotalSeconds < TimeSilver) ret = 1;
+			if (Time.Elapsed.TotalSeconds < TimeGold) ret = 2;
+			return ret;
+		}
+
 
 	}
 }

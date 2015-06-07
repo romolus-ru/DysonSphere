@@ -42,13 +42,24 @@ namespace Engine.Utils.ExtensionMethods
 		}
 
 		/// <summary>
-		/// Отправить данные модели (на сервер)
+		/// Отправить данные
 		/// </summary>
 		/// <param name="controller"></param>
-		/// <param name="dr"></param>
-		public static void SendToModelCommand(this Controller controller, DataRecieveEventArgs dr)
+		public static void SendTo<T>(this Controller controller, string sendTo, string eventName, T eventArgs) where T : EngineEventArgs
 		{
-			controller.StartEvent("SendToModel", null, dr);
+			var dr = DataRecieveEventArgs.Send(eventName, eventArgs.Serialize<T>());
+			controller.AddToOperativeStore(null, StoredEventEventArgs.Stored(sendTo, null, dr));
+		}
+
+		/// <summary>
+		/// Отправить данные модели (на сервер) (сработает в начале следующего цикла)
+		/// </summary>
+		/// <param name="controller"></param>
+		public static void SendToModelCommand<T>(this Controller controller, string eventName, T eventArgs) where T:EngineEventArgs
+		{
+			SendTo(controller, "SendToModel", eventName, eventArgs);
+			//var dr = DataRecieveEventArgs.Send(eventName, eventArgs.Serialize<T>());
+			//controller.AddToOperativeStore(null, StoredEventEventArgs.Stored("SendToModel", null, dr));
 		}
 
 		/// <summary>
@@ -56,9 +67,9 @@ namespace Engine.Utils.ExtensionMethods
 		/// </summary>
 		/// <param name="controller"></param>
 		/// <param name="dr"></param>
-		public static void SendToViewCommand(this Controller controller, DataRecieveEventArgs dr)
+		public static void SendToViewCommand<T>(this Controller controller, string eventName, T eventArgs) where T:EngineEventArgs
 		{
-			controller.StartEvent("SendToView", null, dr);
+			SendTo(controller,"SendToView", eventName,eventArgs);
 		}
 
 		/// <summary>

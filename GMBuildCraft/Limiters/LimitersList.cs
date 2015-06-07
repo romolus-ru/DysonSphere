@@ -13,10 +13,10 @@ namespace GMBuildCraft.Limiters
 	{
 		private List<Limiter> _limiters = new List<Limiter>();
 
-		/// <summary>
-		/// Название списка ограничителей, например строительство стадиона и т.п.
-		/// </summary>
-		public String Name;
+		///// <summary>
+		///// Название списка ограничителей, например строительство стадиона и т.п.
+		///// </summary>
+		//public String Name;
 
 		public void Add(Limiter limiter)
 		{

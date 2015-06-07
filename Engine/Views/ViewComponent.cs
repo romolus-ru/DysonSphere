@@ -65,6 +65,7 @@ namespace Engine.Views
 			Components.Remove(component);
 		}
 
+
 		public ViewComponent(Controller controller, ViewComponent parent=null) : base(controller)
 		{
 			Parent = parent;

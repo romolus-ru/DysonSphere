@@ -178,7 +178,7 @@ namespace Engine.Views
 		/// <param name="x"></param>
 		/// <param name="y"></param>
 		/// <param name="z"></param>
-		public void SetCoordinates(int x, int y, int z)
+		public void SetCoordinates(int x, int y, int z=0)
 		{
 			X = x;
 			Y = y;

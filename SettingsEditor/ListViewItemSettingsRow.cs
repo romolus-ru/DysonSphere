@@ -13,7 +13,7 @@ namespace SettingsEditor
 		public ListViewItemSettingsRow(SettingsRow row)
 		{
 			Row = row;
-			fillFromRow();
+			FillFromRow();
 		}
 
 		/// <summary>
@@ -24,15 +24,13 @@ namespace SettingsEditor
 		public static ListViewItemSettingsRow Get(SettingsRow row)
 		{
 			var lvi = new ListViewItemSettingsRow(row);
-			//lvi.Row = row;
-			//lvi.fillFromRow();
 			return lvi;
 		}
 
 		/// <summary>
 		/// Заполнить элемент данными из переданной строки
 		/// </summary>
-		public void fillFromRow()
+		public void FillFromRow()
 		{
 			SubItems.Clear();
 			Text = Row.Section;
@@ -44,7 +42,7 @@ namespace SettingsEditor
 		/// <summary>
 		/// заполнить переданную строку данными элемента
 		/// </summary>
-		public void fillFromItem()
+		public void FillFromItem()
 		{
 			Row.Section = Text;
 			Row.Name = SubItems[1].Text;

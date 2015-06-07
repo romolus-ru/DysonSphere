@@ -5,13 +5,17 @@ using System.Windows.Forms;
 using Engine;
 using Engine.Controllers;
 using Engine.Controllers.Events;
+using Engine.Utils.ExtensionMethods;
 using Engine.Utils.GraphView;
 using Engine.Utils.Settings;
 using Engine.Views;
 using Engine.Utils.Editor;
 using Engine.Views.Templates;
+using GMTubes.Controllers;
 using GMTubes.Model;
+using GMTubes.View;
 using Button = Engine.Views.Templates.Button;
+using UserInfo = GMTubes.View.UserInfo;
 
 namespace GMTubes
 {
@@ -25,33 +29,80 @@ namespace GMTubes
 	{
 		private ViewControlSystem _sys;
 		private ViewField _vf;
-		private Field _f;
+		private Field _mf;
 		private ViewMenu _menu;
 		private ViewModalInputName _input;
 		private ViewModalCongratulations _congratulations;
 		private Background background;
 		private ViewGraph _graph;
 
+		public View.UserInfo VUserInfo=new UserInfo();
+		public Model.UserInfo MUserInfo;
 
-		public static UserInfo UserInfo=new UserInfo();
+		protected override void SetUpModel(Engine.Models.Model model, Controller controller)
+		{
+			base.SetUpModel(model, controller);
+			MUserInfo=new Model.UserInfo();
+			_mf = new Field(controller);
+			Controller.AddEventHandler("GMTubesUserInfoRecreate", GMTubesUserInfoRecreateEH);
+			Controller.AddEventHandler("GMTubesFieldResolved", GMTubesFieldResolvedEH);// внутреннее событие - уровень решён игроком, нужно собрать нужную информацию и отослать виду
+			Controller.AddEventHandler("GMTubesUserInfoGet", GMTubesUserInfoGetEH);
+		}
+
+		private void GMTubesUserInfoGetEH(object sender, EventArgs e)
+		{
+			// отправляем информацию о пользователе по требованию
+			Controller.SendToViewCommand("GMTubesUserInfoFill",
+				UserInfoEventArgs.Send(MUserInfo.UserName, MUserInfo.Exp, MUserInfo.ExpNext, MUserInfo.CurrentLevel));
+		}
+
+		private void GMTubesFieldResolvedEH(object sender, EventArgs e)
+		{
+			// формируем событие которое отправится виду. получаем параметры уровня и прибавляем результат пользователю
+			_mf.CalculateLevelCost();
+			var t = _mf.LevelTimeInterval();
+			int d = (int)(_mf.LevelCost * t * 0.2);
+			
+			var old1 = MUserInfo.CurrentLevel;
+			MUserInfo.AddExp(_mf.LevelCost);
+			MUserInfo.AddExp(d);// добавка
+			var levelUpdated = MUserInfo.CurrentLevel - old1;
+			GMTubesUserInfoGetEH(sender, e);// обновляем информацию о пользователе
+
+			var v = new VictoryInfoEventArgs();
+			v.IsVictory = true;
+			v.MainExp = _mf.LevelCost;
+			v.extraExp = d;
+			v.SecondsElapsed = (int) _mf.Time.Elapsed.TotalSeconds;
+			v.LevelUpdate = levelUpdated;
+
+			Controller.SendToModelCommand("GMTubesVictory", v);
+		}
+
+		private void GMTubesUserInfoRecreateEH(object sender, EventArgs e)
+		{
+			var ec = e as MessageEventArgs;
+			GMTubesUserInfoRecreate(sender, ec.Deserialize<UserInfoEventArgs>(e));
+		}
+		private void GMTubesUserInfoRecreate(object sender, UserInfoEventArgs e)
+		{
+			MUserInfo.UserName = e.UserName;
+			MUserInfo.CurrentLevel = 1;
+			MUserInfo.Exp = 0;
+			MUserInfo.ExpNext = 100;
+			GMTubesUserInfoGetEH(sender, e);
+		}
 
 		protected override void SetUpView(Engine.Views.View view, Controller controller)
 		{
-			InitUserInfo();
-
 			_sys = new ViewControlSystem(Controller);
 			_sys.Show();
 			view.AddObject(_sys);
 
-			_menu = new ViewMenu(controller, _sys);
+			_menu = new ViewMenu(controller, _sys, VUserInfo);
 			
-			//var b1 = Button.CreateButton(controller, 95, 0, 74, 20, "systemExit", "Выход", "Esc", Keys.Escape, "");
-			//_sys.AddComponent(b1);
-
-			_f = new Field(UserInfo.CurrentLevel);
-			_vf = new ViewField(controller, _sys);
-			_vf.Hide();
-			_vf.SetF(_f);
+			_vf = null;//new ViewField(controller, _sys);
+			//_vf.Hide();
 
 			background = new Background(controller,null,@"..\Resources\gmTubes\wp1.jpg","GMTubesWP1");
 			_sys.AddComponent(background);
@@ -69,52 +120,49 @@ namespace GMTubes
 			Controller.AddEventHandler("GMTubesVictory", GMTubesVictory);
 			Controller.AddEventHandler("GMTubesVictoryOk", GMTubesVictoryOk);
 			Controller.AddEventHandler("GMTubesVictoryCloseModal", GMTubesVictoryCloseModal);
-			Controller.AddEventHandler("GMTubesSet1", GMTubesSet1);
+			Controller.AddEventHandler("GMTubesSet1", GMTubesStartSelected);
 			Controller.AddEventHandler("GMTubesExit", GMTubesExit);
 			Controller.AddEventHandler("GMTubesGraph", GMTubesGraph);
 			Controller.AddEventHandler("GMTubesGraphOut", GMTubesGraphOut);
 			Controller.AddEventHandler("GMTubesGraphCloseModal", GMTubesGraphCloseModal);
+			Controller.AddEventHandler("GMTubesUserInfoFill", GMTubesUserInfoFillEH);
 
+			// требуем у модели передать информацию о пользователе (в ответ получаем GMTubesUserInfoFill)
+			Controller.SendToModelCommand("GMTubesUserInfoGet", new EngineEventArgs());
 			//Controller.AddToStore(this, StoredEventEventArgs.StoredMilliseconds(100, "GMTubesStart", this, EventArgs.Empty));
 		}
 
-		private void InitUserInfo()
+		private void GMTubesUserInfoFillEH(object sender, EventArgs e)
 		{
-			UserInfo.UserName = "none";
-			UserInfo.CurrentLevel = 1;
-			UserInfo.Exp = 0;
-			UserInfo.ExpNext = 100;
-			UserInfo.UserName = Settings.EngineSettings.GetValue("GMTubes", "UserName");
-			String s;
-			s = Settings.EngineSettings.GetValue("GMTubes", "CurrentLevel");
-			if (s != "") { int.TryParse(s, out UserInfo.CurrentLevel); }
-			s = Settings.EngineSettings.GetValue("GMTubes", "Exp");
-			if (s != "") { int.TryParse(s, out UserInfo.Exp); }
-			s = Settings.EngineSettings.GetValue("GMTubes", "ExpNext");
-			if (s != "") { int.TryParse(s, out UserInfo.ExpNext); }
-			if (UserInfo.UserName==""){
+			var ec = e as MessageEventArgs;
+			GMTubesUserInfoFill(sender, ec.Deserialize<UserInfoEventArgs>(e));
+		}
+		private void GMTubesUserInfoFill(object sender, UserInfoEventArgs e)
+		{
+			VUserInfo.UserName = e.UserName;
+			VUserInfo.Exp = e.Exp;
+			VUserInfo.ExpNext = e.ExpNext;
+			VUserInfo.CurrentLevel = e.CurrentLevel;
+			if (VUserInfo.UserName == ""){// рекурсивно вызываем функцию.
 				Controller.AddToOperativeStore(this, StoredEventEventArgs.Stored("GMTubesNewPlayer", this, EventArgs.Empty));
 			}
 		}
 
 		private void GMTubesExit(object sender, EventArgs e)
 		{
-			Settings.EngineSettings.AddValue("GMTubes", "UserName", UserInfo.UserName, "");
-			Settings.EngineSettings.AddValue("GMTubes", "CurrentLevel", UserInfo.CurrentLevel.ToString(), "");
-			Settings.EngineSettings.AddValue("GMTubes", "Exp", UserInfo.Exp.ToString(), "");
-			Settings.EngineSettings.AddValue("GMTubes", "ExpNext", UserInfo.ExpNext.ToString(), "");
+			MUserInfo.SaveUserInfo();
 			Controller.StartEvent("systemExit", this, EventArgs.Empty);
 		}
 
 		private void GMTubesPause(object sender, EventArgs e)
 		{
-			_f.Time.Stop();
-			_menu.btnContinue.Show();
+			_vf.TimePause();
+			//_menu.btnContinue.Show();
 			_menu.Show();
 			_vf.Hide();
 		}
 
-		private void GMTubesSet1(object sender, EventArgs e)
+		private void GMTubesStartSelected(object sender, EventArgs e)
 		{
 			var s = sender as ViewButtonCoords;
 			StartNew(s.Selected);
@@ -122,14 +170,8 @@ namespace GMTubes
 
 		private void GMTubesStart(object sender, EventArgs e)
 		{
-			//StartNew(UserInfo.CurrentLevel);
 			_menu.Hide();
-			_f = new Field(UserInfo.CurrentLevel);
-			_f.CalculateLevelCost();
-			_vf.SetF(_f);
-			_vf.Alpha = 0;
-			_vf.Show();
-			_f.Time.Restart();
+			StartNew(VUserInfo.CurrentLevel);
 		}
 
 		/// <summary>
@@ -139,12 +181,12 @@ namespace GMTubes
 		private void StartNew(int level)
 		{
 			_menu.Hide();
-			_f = new Field(level);
-			_f.CalculateLevelCost();
-			_vf.SetF(_f);
+			if (_vf != null) {_sys.Remove(_vf); _vf.Dispose();}
+			_vf = new ViewField(level, Controller,_sys);
 			_vf.Alpha = 0;
 			_vf.Show();
-			_f.Time.Restart();
+			_vf.TimeContinue();
+			_sys.BringToFront(_vf);
 		}
 
 		private void GMTubesContinue(object sender, EventArgs e)
@@ -152,7 +194,7 @@ namespace GMTubes
 			_menu.Hide();
 			_vf.Show();
 			_vf.Alpha = 0;
-			_f.Time.Start();
+			_vf.TimeContinue();
 		}
 
 		private void GMTubesNewPlayer(object sender, EventArgs e)
@@ -165,10 +207,8 @@ namespace GMTubes
 		private void GMTubesNewPlayerGetName(object sender, EventArgs e)
 		{
 			if (_input != null){
-				UserInfo.UserName = _input.GetResult();
-				UserInfo.CurrentLevel = 1;
-				UserInfo.Exp = 0;
-				UserInfo.ExpNext = 100;
+				var u = UserInfoEventArgs.Send(_input.GetResult(), 0, 100, 1);
+				Controller.SendToModelCommand("GMTubesUserInfoRecreate", u);// сохраняем информацию о пользователе, оттуда придёт обновление информации
 			}
 		}
 
@@ -181,22 +221,24 @@ namespace GMTubes
 
 		private void GMTubesVictory(object sender, EventArgs e)
 		{
-			var dt = _f.Time.Elapsed;
+			var ec = e as MessageEventArgs;
+			var ev = ec.Deserialize<VictoryInfoEventArgs>(e);
+			var dt = TimeSpan.FromSeconds(ev.SecondsElapsed);
 			var dts = dt.Minutes.ToString().PadLeft(2, '0') + ":" + dt.Seconds.ToString().PadLeft(2, '0');
 			_congratulations = new ViewModalCongratulations(Controller, null, "GMTubesVictoryOk", "GMTubesVictoryCloseModal");
 			_congratulations.c1 = Color.White;
 			_congratulations.c2 = Color.Yellow;
 			_congratulations.str1a = "За прохождение уровня вы заработали ";
-			_congratulations.str1b = ""+_f.LevelCost;
+			_congratulations.str1b = ""+ev.MainExp;
 			_congratulations.str1c = " экспы";
 			_congratulations.str2a = "вы прошли уровень за ";
 			_congratulations.str2b = ""+dts;
-			_congratulations.str2c = "";
-			var t = _f.LevelTimeInterval();
-			if (t > 0){
-				int d = (int) (_f.LevelCost*t*0.2);
+			if (ev.LevelUpdate > 0){
+				_congratulations.str2c = " и получили новый уровень!";
+			}
+			if (ev.extraExp > 0){
 				_congratulations.str3a = "За быстрое прохождение вам положена добавка ";
-				_congratulations.str3b = "" +d;
+				_congratulations.str3b = "" +ev.extraExp;
 				_congratulations.str3c = " экспы";
 			}
 			_sys.AddComponent(_congratulations);
@@ -210,13 +252,11 @@ namespace GMTubes
 			_sys.Remove(_congratulations);
 			_congratulations.Dispose();
 			_congratulations = null;
-			var oldl = UserInfo.CurrentLevel;
-			UserInfo.AddExp(_f.LevelCost);
-			UserInfo.AddExp((int)(_f.LevelCost * _f.LevelTimeInterval() * 0.2));// добавка
-			if (oldl != UserInfo.CurrentLevel)
-			{// тут можно запустить ещё одно поздравление со следущим уровнем
-			}
-			GMTubesStart(sender, e);
+			//if (oldl != UserInfo.CurrentLevel){// тут можно запустить ещё одно поздравление со следущим уровнем}
+			//GMTubesStart(sender, e); заменить на что то другое!
+			_menu.Show();// выводим меню
+			_menu.btnContinue.Hide();// прячем кнопку "продолжить"
+			_vf.Hide();
 		}
 
 		private void GMTubesGraph(object sender, EventArgs e)
@@ -233,15 +273,15 @@ namespace GMTubes
 			var fsize2 = new List<PointF>();
 			for (int i = 1; i < 11; i++)
 			{
-				_f.InitCreationParams(i);
-				maxh.Add(new PointF(_f.MaxH, i));
-				maxw.Add(new PointF(_f.MaxW, i));
-				tGold.Add(new PointF(_f.TimeGold, i));
-				tSilver.Add(new PointF(_f.TimeSilver, i));
-				max3x.Add(new PointF(_f.Max3x, i));
-				max4x.Add(new PointF(_f.Max4x, i));
-				fsize.Add(new PointF(i, _f.MaxH * _f.MaxW/100));
-				fsize2.Add(new PointF(_f.MaxH * _f.MaxW/100,i));
+				_mf.InitCreationParams(i);
+				maxh.Add(new PointF(_mf.MaxH, i));
+				maxw.Add(new PointF(_mf.MaxW, i));
+				tGold.Add(new PointF(_mf.TimeGold, i));
+				tSilver.Add(new PointF(_mf.TimeSilver, i));
+				max3x.Add(new PointF(_mf.Max3x, i));
+				max4x.Add(new PointF(_mf.Max4x, i));
+				fsize.Add(new PointF(i, _mf.MaxH * _mf.MaxW/100));
+				fsize2.Add(new PointF(_mf.MaxH * _mf.MaxW/100,i));
 				//_graph.AddPoint("Высота",new PointF(i,_f.MaxH));
 			}
 			_graph.AddGraphLine("Высота", Color.MidnightBlue, maxh);

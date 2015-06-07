@@ -25,13 +25,10 @@ namespace SettingsEditor
 			{
 				_editedFile = value;
 				lblName.Text = @"редактируемый файл " + _editedFile;
-				if (_editedFile == "EngineSettings")
-				{// разрешаем некоторые опции если основной файл настроек
+				if (_editedFile == "EngineSettings"){// разрешаем некоторые опции если основной файл настроек
 					cbRunModule.Enabled = true;
 					btnScan.Enabled = true;
-				}
-				else
-				{// запрещаем дополнительные опции если файл не основных настроек
+				}else{// запрещаем дополнительные опции если файл не основных настроек
 					cbRunModule.Enabled = true;
 					btnScan.Enabled = true;
 				}
@@ -43,12 +40,11 @@ namespace SettingsEditor
 
 		private void SettingsMainForm_Load(object sender, EventArgs e)
 		{
-			openFileDialog1.InitialDirectory = Application.StartupPath;
-			openFileDialog1.Filter = @"файл настроек|*" + Settings.FileExt;
 			saveFileDialog1.InitialDirectory = Application.StartupPath;
 			saveFileDialog1.Filter = @"файл настроек|*" + Settings.FileExt;
 			EditedFile = "EngineSettings" + Settings.FileExt;
 			_currentSettings = Settings.Load(EditedFile);
+			btnScan.PerformClick();
 			FillListView();
 		}
 
@@ -67,7 +63,7 @@ namespace SettingsEditor
 			_currentSettings.ClearSection("files");// удаляем старые файлы
 			var dir = Application.StartupPath;
 			var files = Directory.EnumerateFiles(dir, "*.*", SearchOption.AllDirectories)
-            .Where(s => s.EndsWith(".exe") || s.EndsWith(".dll"));
+			.Where(s => s.EndsWith(".exe") || s.EndsWith(".dll"));
 			//var files = Directory.GetFiles(dir, "*.exe");// dll
 			foreach (var file in files){// добавляем новые файлы
 				var f = Path.GetFileName(file);// получаем только имя и если оно с "vshost" то пропускаем этот файл
@@ -89,11 +85,14 @@ namespace SettingsEditor
 
 			// получаем нужные данные и добавляем к списку выбора
 			cbVisualization.Items.Clear();
+			cbVisualizationServer.Items.Clear();
 			foreach (var viProvider in collector.GetObjects(typeof(VisualizationProvider)))
 			{
 				cbVisualization.Items.Add(viProvider.Key);// + " " + viProvider.Value);
+				cbVisualizationServer.Items.Add(viProvider.Key);
 			}
 			cbVisualization.SelectedIndex = cbVisualization.Items.IndexOf(_currentSettings.GetValue("Default", "Visualization"));
+			cbVisualizationServer.SelectedIndex = cbVisualizationServer.Items.IndexOf(_currentSettings.GetValue("Default", "VisualizationServer"));
 
 			// получаем нужные данные и добавляем к списку выбора
 			cbInput.Items.Clear();
@@ -133,16 +132,17 @@ namespace SettingsEditor
 				MessageBox.Show(this,@"Надо выбрать строку настройки для редактирования", @"", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 				return;
 			}
-			var a = listView1.SelectedItems[0];
+			var a = listView1.SelectedItems[0] as ListViewItemSettingsRow;
 			if (a == null) return;
-			var b = _currentSettings.SearchRow(a.Text, a.SubItems[1].Text);
-			if (b == null) return;
+			var b = a.Row;
 			_currentSettings.AddValue(SettingsEditForm.Edit(b));
 			FillListView();
 		}
 
 		private void btnLoad_Click(object sender, EventArgs e)
 		{
+			openFileDialog1.Filter = @"(*"+Settings.FileExt+@")|*"+Settings.FileExt+@"|Все файлы (*.*)|*.*";
+
 			DialogResult result = openFileDialog1.ShowDialog();
 			if (result == DialogResult.OK)
 			{
@@ -162,12 +162,25 @@ namespace SettingsEditor
 
 		private void cbVisualization_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			var b = _currentSettings.SearchRow("Default", "Visualization");
 			var a = cbVisualization.SelectedItem;
 			if (a == null) return;
+			var b = _currentSettings.SearchRow("Default", "Visualization");
+			if (b == null){
+				b = new SettingsRow("Default", "Visualization", "", "");
+				_currentSettings.AddValue(b);
+			}
+			b.Value = a.ToString();
+			FillListView();
+		}
+
+		private void cbVisualizationServer_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			var a = cbVisualizationServer.SelectedItem;
+			if (a == null) return;
+			var b = _currentSettings.SearchRow("Default", "VisualizationServer");
 			if (b == null)
 			{
-				b = new SettingsRow("Default", "Visualization", "", "");
+				b = new SettingsRow("Default", "VisualizationServer", "", "");
 				_currentSettings.AddValue(b);
 			}
 			b.Value = a.ToString();

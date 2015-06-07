@@ -50,6 +50,9 @@
     <StartupObject>
     </StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Engine.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -82,11 +85,15 @@
     <Compile Include="Controllers\Events\IntegerEventArgs.cs" />
     <Compile Include="Controllers\Events\MessageEventArgs.cs" />
     <Compile Include="Controllers\Events\ModelObjectEventArgs.cs" />
+    <Compile Include="Controllers\Events\PingResultEventArgs.cs" />
     <Compile Include="Controllers\Events\PointEventArgs.cs" />
     <Compile Include="Controllers\Events\DrawToTextureEventArgs.cs" />
     <Compile Include="Controllers\Events\SoundLinkEventArgs.cs" />
     <Compile Include="Controllers\Events\StoredEventEventArgs.cs" />
+    <Compile Include="Controllers\Events\ViewControlEventArgs.cs" />
     <Compile Include="Controllers\Events\ViewObjectEventArgs.cs" />
+    <Compile Include="Controllers\Net\DataSenderClient.cs" />
+    <Compile Include="Controllers\Net\DataSenderServer.cs" />
     <Compile Include="IEngineObject.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="ISound.cs" />
@@ -109,6 +116,9 @@
     <Compile Include="Utils\FileArchieve.cs" />
     <Compile Include="Utils\GraphView\GraphicLine.cs" />
     <Compile Include="Utils\GraphView\ViewGraph.cs" />
+    <Compile Include="Controllers\Net\Client.cs" />
+    <Compile Include="Controllers\Net\ClientConnection.cs" />
+    <Compile Include="Controllers\Net\Server.cs" />
     <Compile Include="Utils\Path\Path.cs" />
     <Compile Include="Utils\Path\PathGenerator.cs" />
     <Compile Include="Utils\Path\PathGeneratorBezier.cs" />
@@ -120,6 +130,10 @@
     <Compile Include="Utils\StateOne.cs" />
     <Compile Include="Utils\StateOneTime.cs" />
     <Compile Include="Utils\StatesEnum.cs" />
+    <Compile Include="Views2\ViewControl.cs" />
+    <Compile Include="Views2\ViewDraggable.cs" />
+    <Compile Include="Views2\ViewObject.cs" />
+    <Compile Include="Views2\ViewSystem.cs" />
     <Compile Include="Views\IViewObject.cs" />
     <Compile Include="Views\Templates\Background.cs" />
     <Compile Include="Views\Templates\Button.cs" />
@@ -174,7 +188,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Engine.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

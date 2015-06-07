@@ -42,15 +42,15 @@ namespace GMBuildCraft
 		private Boolean _dragged = false;
 		private StateOne _stateInc = new StateOne();
 		private StateOne _stateDec = new StateOne();
-		private float _koeff = 0.0f;
+		//private float _koeff = 0.0f;
 		private int _nearestStarSystem = -1;// необходимо найти ближайшие и систему и путь к ней что бы показать информацию
-		private int _nearestStarSystemWay = -1;// система выбрана постоянно, но если курсор ближе к пути то вывести информацию о пути
+		//private int _nearestStarSystemWay = -1;// система выбрана постоянно, но если курсор ближе к пути то вывести информацию о пути
 		private int _nearestStarPoint = -1;// необходимо выбирать и путь и узловую точку
-		private int _nearestStarPointRoad = -1;// и обоих выводить и выводить вспомогательные окна
+		//private int _nearestStarPointRoad = -1;// и обоих выводить и выводить вспомогательные окна
 		private Point _cursorUniverse = new Point(0, 0);
 		private ResourcesDesctiptions _rd;
-		private Boolean _IsSetDirection = false;// направление
-		private int _currDirection;
+		private Boolean _isSetDirection = false;// направление
+		//private int _currDirection;
 		public double F;
 		private int _rotateResource;
 
@@ -111,7 +111,7 @@ namespace GMBuildCraft
 
 			return;
 
-			_rotateResource++;if (_rotateResource >= 360) _rotateResource = 0;
+			/*_rotateResource++;if (_rotateResource >= 360) _rotateResource = 0;
 			//vp.SetColor(Color.Red);vp.Print(921,11,"Universe");
 			vp.SetColor(Color.White);vp.Print(920, 10, "Universe");
 			if (Universe == null) return;
@@ -199,7 +199,7 @@ namespace GMBuildCraft
 					vp.SetColor(Color.Red);
 					vp.Line(x, y, CursorPoint.X, CursorPoint.Y);
 					//DrawAvailableResources(vp, ps, x, y);
-					if (_IsSetDirection) DrawDirection(vp, CursorPoint, starSystem, ps, x, y, vsx, vsy, _scaleS);
+					if (_isSetDirection) DrawDirection(vp, CursorPoint, starSystem, ps, x, y, vsx, vsy, _scaleS);
 				}
 				foreach (var road in starSystem.Roads){
 					DrawRoad(road, vp, vsx, vsy, _scaleS);
@@ -210,6 +210,7 @@ namespace GMBuildCraft
 			}
 			DrawResourcesSigns(vp);
 			//DrawRotatedResources(vp,300,300,_scaleU);
+			 */
 		}
 
 		private void DrawRotatedResources(VisualizationProvider vp, int x, int y, int scaleU)
@@ -393,7 +394,7 @@ namespace GMBuildCraft
 					point.Pt.X / _scaleU - _viewUX / _scaleU,
 					point.Pt.Y / _scaleU - _viewUY / _scaleU);
 
-			if (_IsSetDirection){// особый режим, вычисляем направление
+			if (_isSetDirection){// особый режим, вычисляем направление
 				return;
 			}
 
@@ -497,7 +498,7 @@ namespace GMBuildCraft
 					var p = starSystem.Points[_nearestStarPoint];
 					var r = MapGenerator.Distance(p.Point, cursorUniverseLocal);
 					if (r < 10){
-						_IsSetDirection = true;
+						_isSetDirection = true;
 						return;
 					}
 				}
@@ -508,8 +509,8 @@ namespace GMBuildCraft
 
 		protected override void DragEnd(int relX, int relY)
 		{
-			if (_IsSetDirection){
-				_IsSetDirection = false;
+			if (_isSetDirection){
+				_isSetDirection = false;
 				return;
 			}
 			_dragged = false;

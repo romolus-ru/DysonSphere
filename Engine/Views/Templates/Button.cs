@@ -79,8 +79,8 @@ namespace Engine.Views.Templates
 			visualizationProvider.RotateReset();
 			String txt;
 			Color color;
-			if (CursorOver){txt = "[" + Caption + "]";color = Color.Yellow;
-			}else{txt = " " + Caption + " ";color = Color.Green;
+			if (CursorOver){txt = "[" + Caption + "]";color = Color.Red;
+			}else{txt = " " + Caption + " ";color = Color.White;
 			}
 			var f = visualizationProvider.FontHeightGet() / 2;
 

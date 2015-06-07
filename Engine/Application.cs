@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Engine.Controllers.Events;
 using Engine.Controllers;
+using Engine.Controllers.Net;
 using Engine.Models;
 using Engine.Utils;
 using Engine.Utils.Settings;
@@ -10,6 +12,14 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace Engine
 {
+	public enum AppType
+	{
+		local,
+		client,
+		server,
+		client_server
+	}
+
 	public class Application
 	{
 		#region Основные переменные
@@ -62,10 +72,15 @@ namespace Engine
 		/// <summary>
 		/// Отправка данных клиенту
 		/// </summary>
-		private readonly DataSender _toModelDataSender;
+		public static DataSender _toModelDataSender;
 
-		private readonly DataSender _toViewDataSender;
+		public static DataSender _toViewDataSender;
 
+		/// <summary>
+		/// Тип запущенного приложения
+		/// </summary>
+		/// <remarks>Предполагаю что иногда нужно будет узнать что за приложение запущено, например для расширения функционала клиента, если он является сервером</remarks>
+		public static AppType AppType = AppType.local;// по умолчанию тип = "local", без возможности запуска сервера
 
 		#endregion
 
@@ -74,14 +89,16 @@ namespace Engine
 		/// </summary>
 		public Application()
 		{
-
+			AppType = GetArgsAppType();
 			testArchiveOperations();
 
 			// создание контроллера
 			_controller = new Controller();
 
-			// регистрируем метод для получения главного таймера
-			_controller.AddEventHandler("GetMainTimerRun", (o, args) => GetMainTimerRun(o, (GetHandlerEventArgs) args));
+			// регистрируем метод для получения главного таймера (писалось для XNA, что бы можно было передать потом основной цикл ему)
+			_controller.AddEventHandler("GetMainTimerRun", (o, args) => GetMainTimerRun(o, (GetHandlerEventArgs)args));
+			_controller.AddEventHandler("StartServer", SetNetCreateServer);
+			_controller.AddEventHandler("StartClient", SetNetCreateClient);
 
 			// создание коллектора
 			_collector = new Collector(_controller);
@@ -104,7 +121,8 @@ namespace Engine
 			// которая убирает таймер, его лучше создать сразу
 			_mainTimer = new Timer();
 			_mainTimer.Interval = TimerInterval;
-			_mainTimer.Tick += MainTimerRun;
+			//if (AppType != AppType.server){
+			_mainTimer.Tick += MainTimerRun;//}else{_mainTimer.Tick += MainTimerRunServer;}
 
 			// чтение из настроек сборок, которые надо сканировать
 			var assemblies = new List<string>();
@@ -116,11 +134,15 @@ namespace Engine
 			{
 				_collector.FindObjectsInAssembly(assembly, typesForSearch);
 			}
-
 			// если ошибок не возникло то надо создавать визуализацию
 			// хотя можно создать визуализацию через контрол
 			//_controller.StartEvent("VisualizationStart", null, EventArgs.Empty);
 			String visualizationName = Settings.EngineSettings.GetValue("Default", "Visualization");
+			// для сервера запускаем отдельную специальную визуализацию
+			if (AppType == AppType.server){
+				visualizationName = Settings.EngineSettings.GetValue("Default", "ServerVisualization");
+				SetNetCreateServer(null,EventArgs.Empty);// 
+			}
 			if (visualizationName == ""){throw new Exception(" не указана система визуализации в настройках");}
 			_visualizationProvider = (VisualizationProvider)_collector.Create(
 				typeof(VisualizationProvider), visualizationName);
@@ -144,28 +166,46 @@ namespace Engine
 			// пока предполагаем что звук отдельно. но в общем случае звук может быть встроен в визуализацию
 			String soundName = Settings.EngineSettings.GetValue("Default", "Sound");
 			if (soundName == "") { soundName = "Engine.ISound"; }// базовый класс, заготовка
-			var isound = (ISound)_collector.Create(typeof(ISound), soundName);
-			if (isound == null) { 
+			var iSound = (ISound)_collector.Create(typeof(ISound), soundName);
+			if (iSound == null) { 
 				_controller.SendError("Звуковое устройство отсутствует " + soundName);
 				// и оставляем его null раз его всё равно нету
 			}
-			_sound = new Sound(isound);
+			_sound = new Sound(iSound);
 			_sound.Init(_controller);
 
+			// локальные обработчики создаются в любом случае. потом уже в процессе запуска они заменяются
+			// а вот как заменяются - пока не понятно SetNewObjects
+			// но если предполагается запуск сервера, то создаётся серверный обработчик сразу. и при инициализации модуля он инициализирует только сервер
 			_toModelDataSender = new DataSender(_controller, "SendToModel");// создаём отправителя сообщений Модели (фактически серверу)
 			_toViewDataSender = new DataSender(_controller, "SendToView");// создаём отправителя сообщений Виду (фактически клиенту)
-
-			// запуск всех модулей
-			//ModulesRun();
+			
 			// запуск одного модуля из настроек
 			String moduleName = Settings.EngineSettings.GetValue("Default", "Module");
 			if (moduleName == "") { throw new Exception(" не указан запускаемый модуль в настройках"); }// модуль обязательно нужен
 			var module = (Module)_collector.Create(typeof(Module), moduleName);
-			if (_input == null) { _controller.SendError("Запускаемый модуль не обнаружен в подключенных сборках " + moduleName); }
-			module.Init(_model, _view, _controller);
+			if (module == null) { _controller.SendError("Запускаемый модуль не обнаружен в подключенных сборках " + moduleName); }
+			else module.Init(_model, _view, _controller);
 
 			_controller.SendError("Создание объекта Application завершено");
 			_controller.StartEvent("SystemStarted");// передаём все сообщения объектам
+		}
+
+		/// <summary>
+		/// Получаем параметры командной строки и забираем из них тип сервера
+		/// </summary>
+		/// <returns></returns>
+		private AppType GetArgsAppType()
+		{
+			var r = AppType.local;// по умолчанию всё запускается локально, на одном компьютере, используются внутрипрограммная передача данных
+			var a = Environment.GetCommandLineArgs();
+			foreach (var s in a){
+				var s1 = s.ToUpper();
+				if (s1 == "CLIENT") r = AppType.client;
+				if (s1 == "SERVER") r = AppType.server;
+				if (s1 == "CLIENT-SERVER") r = AppType.client_server;// запускается клиент с сервером
+			}
+			return r;
 		}
 
 		/// <summary>
@@ -202,6 +242,25 @@ namespace Engine
 			*/
 		}
 
+		private void SetNetCreateServer(object sender, EventArgs args)
+		{
+			_toModelDataSender.Dispose();
+			String s;
+			s = Settings.EngineSettings.GetValue("Default", "port");
+			int port = Convert.ToInt32(s);
+			_toModelDataSender = new DataSenderServer(_controller, "SendToView", port);
+		}
+
+		private void SetNetCreateClient(object sender, EventArgs args)
+		{
+			_toViewDataSender.Dispose();
+			String s;
+			s = Settings.EngineSettings.GetValue("Default", "port");
+			int port = Convert.ToInt32(s);
+			var address = Settings.EngineSettings.GetValue("Default", "address");
+			_toViewDataSender = new DataSenderClient(_controller, "SendToModel", address, port);
+		}
+
 		/// <summary>
 		/// Вспомогательная функция. Получает метод основного цикла событий и отключает таймер
 		/// </summary>
@@ -212,7 +271,9 @@ namespace Engine
 			if (_mainTimer != null){
 				_mainTimer.Enabled = false; // отключаем таймер
 			}
-			args.Set(MainTimerRun);		// передаём главную функцию
+			// передаём главную функцию
+			//if (AppType != AppType.server){
+			args.Set(MainTimerRun); //}else{args.Set(MainTimerRunServer);}
 		}
 
 		/// <summary>
@@ -244,9 +305,13 @@ namespace Engine
 			_controller.StartEvent("BeginLoop", null, EventArgs.Empty);
 			_input.GetInput();// обработка устройств ввода
 
+			_model.Execute();
+
 			_view.Draw();
 
 			_controller.StartEvent("EndLoop", null, EventArgs.Empty);
 		}
+
+
 	}
 }

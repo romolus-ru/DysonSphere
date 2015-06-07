@@ -29,6 +29,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Module.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -41,22 +44,35 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\CreateFieldEventArgs.cs" />
+    <Compile Include="Controllers\ElapsedTimeEventArgs.cs" />
+    <Compile Include="Controllers\FieldInfoEventArgs.cs" />
+    <Compile Include="Controllers\FieldPointExchange.cs" />
+    <Compile Include="Controllers\RotateClickEventArgs.cs" />
+    <Compile Include="Controllers\RotatedEventArgs.cs" />
+    <Compile Include="Controllers\UserInfoEventArgs.cs" />
+    <Compile Include="Controllers\VictoryInfoEventArgs.cs" />
     <Compile Include="Model\Field.cs" />
     <Compile Include="Model\FieldPoint.cs" />
     <Compile Include="GMTubes.cs" />
+    <Compile Include="Model\UserInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserInfo.cs" />
-    <Compile Include="ViewButtonCoords.cs" />
-    <Compile Include="ViewField.cs" />
-    <Compile Include="ViewMenu.cs" />
-    <Compile Include="ViewModalCongratulations.cs" />
-    <Compile Include="ViewModalInputName.cs" />
+    <Compile Include="View\UserInfo.cs" />
+    <Compile Include="View\ViewButtonCoords.cs" />
+    <Compile Include="View\ViewField.cs" />
+    <Compile Include="View\ViewFieldPoint.cs" />
+    <Compile Include="View\ViewMenu.cs" />
+    <Compile Include="View\ViewModalCongratulations.cs" />
+    <Compile Include="View\ViewModalInputName.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.csproj">
       <Project>{61C43545-2FFA-4E9C-8708-2FDC0DE50361}</Project>
       <Name>Engine</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Module.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -38,6 +38,7 @@ namespace Engine
 		/// </summary>
 		/// <param name="model"></param>
 		/// <param name="view"></param>
+		/// <param name="controller"></param>
 		public void Init(Model model, View view,Controller controller)
 		{
 			Controller = controller;
@@ -46,6 +47,17 @@ namespace Engine
 			HandlersAddThis();
 		}
 
+		/// <summary>
+		/// Инициализируем сервер - у модуля запускаем установку Модели, вид не трогаем
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="controller"></param>
+		public void InitServer(Model model, Controller controller)
+		{
+			Controller = controller;
+			SetUpModel(model, Controller);
+			HandlersAddThis();
+		}
 		/// <summary>
 		/// Установки для модели
 		/// </summary>

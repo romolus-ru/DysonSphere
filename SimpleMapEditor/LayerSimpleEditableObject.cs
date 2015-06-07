@@ -35,7 +35,7 @@ namespace SimpleMapEditor
 		private Button _moveObjectButton;
 
 		private SimpleEditableObject _targeted;// выделенный объект на экране
-		private SimpleEditableObject _brush;// для копирования свойств
+		//private SimpleEditableObject _brush;// для копирования свойств
 
 		private enum Modes
 		{

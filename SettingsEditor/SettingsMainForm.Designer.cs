@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsMainForm));
 			this.label4 = new System.Windows.Forms.Label();
 			this.cbInput = new System.Windows.Forms.ComboBox();
 			this.label3 = new System.Windows.Forms.Label();
@@ -50,13 +51,15 @@
 			this.btnLoad = new System.Windows.Forms.Button();
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+			this.label5 = new System.Windows.Forms.Label();
+			this.cbVisualizationServer = new System.Windows.Forms.ComboBox();
 			this.SuspendLayout();
 			// 
 			// label4
 			// 
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(293, 96);
+			this.label4.Location = new System.Drawing.Point(293, 119);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(100, 13);
 			this.label4.TabIndex = 33;
@@ -67,7 +70,7 @@
 			this.cbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbInput.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbInput.FormattingEnabled = true;
-			this.cbInput.Location = new System.Drawing.Point(397, 93);
+			this.cbInput.Location = new System.Drawing.Point(397, 116);
 			this.cbInput.Name = "cbInput";
 			this.cbInput.Size = new System.Drawing.Size(247, 21);
 			this.cbInput.TabIndex = 32;
@@ -77,7 +80,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(358, 69);
+			this.label3.Location = new System.Drawing.Point(358, 92);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(31, 13);
 			this.label3.TabIndex = 31;
@@ -88,7 +91,7 @@
 			this.cbSound.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbSound.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.cbSound.FormattingEnabled = true;
-			this.cbSound.Location = new System.Drawing.Point(397, 66);
+			this.cbSound.Location = new System.Drawing.Point(397, 89);
 			this.cbSound.Name = "cbSound";
 			this.cbSound.Size = new System.Drawing.Size(247, 21);
 			this.cbSound.TabIndex = 30;
@@ -128,9 +131,9 @@
 			this.listView1.FullRowSelect = true;
 			this.listView1.GridLines = true;
 			this.listView1.HideSelection = false;
-			this.listView1.Location = new System.Drawing.Point(13, 120);
+			this.listView1.Location = new System.Drawing.Point(13, 141);
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(631, 337);
+			this.listView1.Size = new System.Drawing.Size(631, 316);
 			this.listView1.TabIndex = 27;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
@@ -250,18 +253,40 @@
 			// 
 			// openFileDialog1
 			// 
-			this.openFileDialog1.FileName = "openFileDialog1";
 			this.openFileDialog1.Title = "Открыть файл настроек";
 			// 
 			// saveFileDialog1
 			// 
 			this.saveFileDialog1.Title = "Сохранить настройки";
 			// 
+			// label5
+			// 
+			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(275, 67);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(124, 13);
+			this.label5.TabIndex = 35;
+			this.label5.Text = "Визуализация сервера";
+			// 
+			// cbVisualizationServer
+			// 
+			this.cbVisualizationServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbVisualizationServer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbVisualizationServer.FormattingEnabled = true;
+			this.cbVisualizationServer.Location = new System.Drawing.Point(398, 64);
+			this.cbVisualizationServer.Name = "cbVisualizationServer";
+			this.cbVisualizationServer.Size = new System.Drawing.Size(247, 21);
+			this.cbVisualizationServer.TabIndex = 34;
+			this.cbVisualizationServer.SelectedIndexChanged += new System.EventHandler(this.cbVisualizationServer_SelectedIndexChanged);
+			// 
 			// SettingsMainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(656, 469);
+			this.Controls.Add(this.cbVisualizationServer);
+			this.Controls.Add(this.label5);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.cbInput);
 			this.Controls.Add(this.label3);
@@ -278,6 +303,7 @@
 			this.Controls.Add(this.lblName);
 			this.Controls.Add(this.btnSave);
 			this.Controls.Add(this.btnLoad);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "SettingsMainForm";
 			this.Text = "Редактор настроек";
 			this.Load += new System.EventHandler(this.SettingsMainForm_Load);
@@ -310,6 +336,8 @@
 		private System.Windows.Forms.Button btnLoad;
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 		private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.ComboBox cbVisualizationServer;
 	}
 }
 

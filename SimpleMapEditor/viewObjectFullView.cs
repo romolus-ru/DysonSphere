@@ -15,7 +15,7 @@ namespace SimpleMapEditor
 {
 	class viewObjectFullView:ViewObject
 	{
-		public editor Editor;
+		private editor Editor;
 		public int textureNum;
 
 		private Controller _controller;
@@ -34,6 +34,8 @@ namespace SimpleMapEditor
 		public viewObjectFullView(Controller controller): base(controller)
 		{
 			_controller = controller;
+			Editor = null;
+			textureNum = 0;
 		}
 
 		public override void Init(VisualizationProvider visualizationProvider)

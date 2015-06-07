@@ -1,5 +1,11 @@
-﻿using System;
+﻿			//от сервера должно сообщение приходить всем
+			//от клиента должно приходить сообщение только серверу, и не отсылаться обратно
+			//а вот присланное сообщение сервер может послать всем, но это уже другая историяusing System;
+
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +14,11 @@ using Engine.Utils.ExtensionMethods;
 
 namespace Engine.Controllers
 {
+	/// <summary>
+	/// Делегат для обмена строками
+	/// </summary>
+	public delegate void GetStringDelegate(string str);
+
 	/// <summary>
 	/// Отправитель данных
 	/// </summary>
@@ -22,33 +33,69 @@ namespace Engine.Controllers
 	/// 
 	/// кое какая информация там https://msdn.microsoft.com/en-us/library/w89fhyex(v=vs.110).aspx
 	/// </remarks>
-	class DataSender
+	public class DataSender:IDisposable
 	{
 		private readonly Controller _controller;
 		
 		/// <summary>
 		/// Получаемые события, которые надо отправить, например "FromServerToClient"
 		/// </summary>
-		private string _acceptedEvent;
+		protected string AcceptedEvent;
 
 		public DataSender(Controller controller,String acceptedEvent)
 		{
 			_controller = controller;
-			_acceptedEvent = acceptedEvent;
-			_controller.AddEventHandler(_acceptedEvent, AcceptEvent);
+			AcceptedEvent = acceptedEvent;
+			_controller.AddEventHandler(AcceptedEvent, AcceptEvent);
 		}
 
-		private void AcceptEvent(object sender, EventArgs e)
+		protected void AcceptEvent(object sender, EventArgs e)
 		{
+			var m = e as MessageEventArgs;
+			if (m != null){
+				PrintNetDebug(this.GetType().FullName);
+			}
 			Send(e as DataRecieveEventArgs);
 		}
 
-		public void Send(DataRecieveEventArgs dr)
+		/// <summary>
+		/// Отправляем событие
+		/// </summary>
+		/// <param name="dr"></param>
+		public virtual void Send(DataRecieveEventArgs dr)
 		{
 			// в данном случае - получаем событие и сразу же отправляем его дальше
-			// и обходимся без десериализации
-			_controller.StartEvent(dr.EventName,null,MessageEventArgs.Msg(dr.DataString));
+			// и обходимся без десериализации, до recieve дело не доходит
+			PrintNetDebug("DATASender send " + dr.EventName + "+" + dr.DataString);
+			Recieve(dr.EventName+"+"+ dr.DataString);
+			//_controller.StartEvent(dr.EventName,null,MessageEventArgs.Msg(dr.DataString));
 		}
 
+		/// <summary>
+		/// Получаем событие из сети и сразу же его отправляем в местную систему
+		/// </summary>
+		public virtual void Recieve(string data)
+		{
+			var eventName = "PrintNetDebug2";
+			var eventData = data;
+			var p = data.IndexOf('+');
+			if (p >= 0){
+				eventName = data.Substring(0, p);
+				eventData = data.Substring(p + 1);
+			}
+			//PrintNetDebug(this.GetType().FullName + " Recieve " + eventName + " " + data);
+			_controller.StartEvent(eventName, null, MessageEventArgs.Msg(eventData));
+		}
+
+		public virtual void Dispose()
+		{
+			_controller.RemoveEventHandler(AcceptedEvent, AcceptEvent);
+		}
+
+		public void PrintNetDebug(string str)
+		{
+			_controller.StartEvent("PrintNetDebug", null, MessageEventArgs.Msg(str));
+			//Debug.Print("> "+str);
+		}
 	}
 }

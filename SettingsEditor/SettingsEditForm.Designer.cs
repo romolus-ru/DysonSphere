@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsEditForm));
 			this.label5 = new System.Windows.Forms.Label();
 			this.tbHint = new System.Windows.Forms.TextBox();
 			this.label3 = new System.Windows.Forms.Label();
@@ -149,6 +150,7 @@
 			this.Controls.Add(this.tbSection);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnOk);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "SettingsEditForm";
 			this.Text = "Редактирование записи настройки";
 			this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.SettingsEditForm_KeyUp);

@@ -8,9 +8,9 @@ namespace Engine.Controllers.Events
 	/// <summary>
 	/// Передаёт целое число
 	/// </summary>
-	public class IntegerEventArgs : EventArgs
+	public class IntegerEventArgs : EngineEventArgs
 	{
-		public int I { get; private set; }
+		public int I;
 
 		public void Set(int iNew)
 		{

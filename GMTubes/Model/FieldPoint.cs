@@ -14,8 +14,6 @@ namespace GMTubes.Model
 
 		public Boolean Broken = false;
 
-		private float _addToRotate = 0;
-
 		/// <summary>
 		/// Ссылки на соседние ячейки
 		/// </summary>
@@ -81,7 +79,7 @@ namespace GMTubes.Model
 		}
 
 		/// <summary>
-		/// По умолчанию поворот = 0 и это положение решения (но потом это может быть будет изменено)
+		/// По умолчанию поворот = 0 и это положение решения
 		/// </summary>
 		public int angle = 0;
 
@@ -125,7 +123,6 @@ namespace GMTubes.Model
 		/// </summary>
 		public void Rotate()
 		{
-			_addToRotate -= (90 /*+ 360*/);
 			if (texnum == 1) return;// объект с четыремя связями не вращается
 			currentAngle++;
 			if (texnum == 3){
@@ -133,16 +130,6 @@ namespace GMTubes.Model
 				return;
 			}
 			if (currentAngle > 3) currentAngle = 0;
-		}
-
-		public int AddRotate()
-		{
-			if (_addToRotate == 0) return 0;
-			var n = _addToRotate/18;
-			if (_addToRotate < -10) n *= 3;
-			_addToRotate -= n;
-			if (_addToRotate >- 2) _addToRotate = 0;
-			return (int)_addToRotate;
 		}
 
 	}

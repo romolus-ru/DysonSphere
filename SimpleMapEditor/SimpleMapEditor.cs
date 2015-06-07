@@ -14,8 +14,8 @@ namespace SimpleMapEditor
 	class SimpleMapEditor : Module
 	{
 		private editor _editor;
-		private viewObjectFullView _voFullView;
-		private Boolean _newObjClick;
+		//private viewObjectFullView _voFullView;
+		//private Boolean _newObjClick;
 		private Dictionary<int, SimpleEditableObject> data = new Dictionary<int, SimpleEditableObject>();
 		private LayerSimpleEditableObject l1;
 		private LayerSimpleEditableObjectView l2;
@@ -26,7 +26,7 @@ namespace SimpleMapEditor
 		private ViewModalSelectFile selectFile;
 		private ViewModalInputName InputString;
 		private ViewWindow window2;
-		private ViewModalInput input;
+		//private ViewModalInput input;
 		private ShowMsg ShowMsg;
 
 		private ViewControlSystem sys;

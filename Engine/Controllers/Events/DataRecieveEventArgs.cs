@@ -23,29 +23,29 @@ namespace Engine.Controllers.Events
 		/// Отправляемые данные
 		/// </summary>
 		public String DataString = "";
-		/// <summary>
-		/// Сериализовать
-		/// </summary>
-		/// <returns></returns>
-		public virtual String Serialize()
-		{
-			/*XmlSerializer xmlSerializer = new XmlSerializer(this.GetType());}
-			StringWriter textWriter = new StringWriter();
-			xmlSerializer.Serialize(textWriter, this);
-			return textWriter.ToString();*/
-			return this.SerializeObject();
-		}
-		/// <summary>
-		/// Десериализовать
-		/// </summary>
-		/// <returns></returns>
-		public virtual DataRecieveEventArgs Deserialize(String serialized)
-		{
-			/*XmlSerializer xmlSerializer = new XmlSerializer(this.GetType());
-			StringReader textReader = new StringReader(serialized);
-			return (DataRecieveEventArgs)xmlSerializer.Deserialize(textReader);*/
-			return serialized.DeserializeObject<DataRecieveEventArgs>();
-		}
+		///// <summary>
+		///// Сериализовать
+		///// </summary>
+		///// <returns></returns>
+		//public virtual String Serialize()
+		//{
+		//	/*XmlSerializer xmlSerializer = new XmlSerializer(this.GetType());}
+		//	StringWriter textWriter = new StringWriter();
+		//	xmlSerializer.Serialize(textWriter, this);
+		//	return textWriter.ToString();*/
+		//	return this.SerializeObject();
+		//}
+		///// <summary>
+		///// Десериализовать
+		///// </summary>
+		///// <returns></returns>
+		//public new DataRecieveEventArgs Deserialize(String serialized)
+		//{
+		//	/*XmlSerializer xmlSerializer = new XmlSerializer(this.GetType());
+		//	StringReader textReader = new StringReader(serialized);
+		//	return (DataRecieveEventArgs)xmlSerializer.Deserialize(textReader);*/
+		//	return base.Deserialize<DataRecieveEventArgs>(serialized);
+		//}
 
 		public static DataRecieveEventArgs Send(String eventName, String dataString)
 		{

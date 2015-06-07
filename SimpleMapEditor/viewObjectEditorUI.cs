@@ -56,6 +56,11 @@ namespace SimpleMapEditor
 		public viewObjectEditorUI(Controller controller): base(controller)
 		{
 			this._controller = controller;
+			NewObjClick = false;
+			PaintObjClick = false;
+			GetInfoObjectClick = false;
+			Editor = null;
+			ObjType=ObjectTypes.Empty;
 			//_controller.AddEventHandler("Cursor", CursorMovedEH);
 			//_controller.AddEventHandler("Keyboard", KeyboardEH);
 		}

@@ -47,7 +47,16 @@ namespace Engine.Models
 		/// или что он не нужен или придётся переделывать</remarks> 
 		private void EHAddObject(object sender, ModelObjectEventArgs modelObjectEventArgs)
 		{
-			_modelObjects.Add(modelObjectEventArgs.ModelObject);
+			AddObject(modelObjectEventArgs.ModelObject);
+		}
+
+		/// <summary>
+		/// Добавить объект
+		/// </summary>
+		/// <param name="modelObject"></param>
+		public void AddObject(IModelObject modelObject)
+		{
+			_modelObjects.Add(modelObject);
 		}
 
 		/// <summary>
